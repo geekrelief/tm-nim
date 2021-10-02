@@ -2,4 +2,5 @@
 *.exe
 *.exp
 *.lib
+*.def
 tm.nim

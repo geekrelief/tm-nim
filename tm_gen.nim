@@ -1,3 +1,6 @@
+{.hint[DuplicateModuleImport]:false.}
+{.warning[UnusedImport]:false.}
+
 import nimterop/[cimport, paths]
 import os, strformat, sugar, strutils, sequtils, macros
 
