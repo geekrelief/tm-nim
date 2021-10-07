@@ -4,7 +4,7 @@
 import nimterop/[cimport, paths]
 import os, strformat, sugar, strutils, sequtils, macros
 
-const tm_dir = "C:/tm/tm-nim"
+import globals
 
 static:
   #cDebug()
@@ -16,18 +16,14 @@ proc getHeaders():seq[string] =
       if i.kind == pcFile and i.path.endsWith(".h"):
         i.path
 
+cExclude("api_types.h")
 cIncludeDir(r".")
 cDefine("TM_LINKS_FOUNDATION")
 cDefine("_MSC_VER")
 cDefine("TM_OS_WINDOWS")
 
-cOverride:
-  template TM_VERSION*(Major, Minor, Patch): untyped  =
-    tm_version_t(major: Major, minor: Minor, patch: Patch)
-
-
 #cImport(filenames = static(getHeaders()), nimFile = "tm.nim")
 cImport( flags = "-E_ -F_ -G__=_", recurse = true,
-  nimFile = "tm.nim", 
+  nimFile = "tm_generated.nim", 
   filenames = static(getHeaders())
 )

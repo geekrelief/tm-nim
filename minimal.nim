@@ -1,10 +1,9 @@
-import tm
+include tm
 import strformat
 
 const version = TM_VERSION(0, 7, 0)
 
-proc NimMain() {.dynlib, exportc, cdecl, importc.}
-proc tm_load_plugin(reg: ptr tm_api_registry_api, load: bool) {.exportc, cdecl, dynlib.} =
+proc tm_load_plugin(reg: ptr tm_api_registry_api, load: bool) {.callback.} =
   if load: 
     NimMain()
 
@@ -14,3 +13,6 @@ proc tm_load_plugin(reg: ptr tm_api_registry_api, load: bool) {.exportc, cdecl, 
 
   
   logger.print(TM_LOG_TYPE_INFO, cstring &"{version=}: " & (if not load: "Unloading old plugin" else: "Hello from Nim!"))
+
+  var tmTtIdT = TtId(1, 2, 3)
+  logger.print(Tmlogtypeinfo, $$ &"{tmTtIdT.generation=}")
