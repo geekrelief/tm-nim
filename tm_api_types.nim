@@ -59,13 +59,13 @@ proc TtId*(`type`, generation, index: uint64): tm_tt_id_t {.inline.} =
     (index and 0xffff_ffff'u64)
 
 proc `type`*(id: tm_tt_id_t): uint64 {.inline.} =
-  id.u64 shr 54
+  id.u64 and 0x3ff
 
 proc generation*(id: tm_tt_id_t): uint64 {.inline.} = 
-  (id.u64 shr 32) and 0x3f_ffff'u64
+  (id.u64 shr 10) and 0x3f_ffff'u64
 
 proc index*(id: tm_tt_id_t): uint64 {.inline.} =
-  id.u64 and 0xffff_ffff'u64
+  (id.u64 shr 32)
 
 converter toTtType*(id: tm_tt_id_t): tm_tt_type_t {.inline.} =
   tm_tt_type_t(u64: id.`type`)
