@@ -42,7 +42,7 @@ type
   tm_tt_type_t* {.struct, impapi_typesHdr, importc: "struct tm_tt_type_t".} = object
     u64*: uint64
 
-  tm_tt_id_t* {.bycopy, union, impapi_typesHdr, importc: "struct tm_tt_id_t".} = object
+  tm_tt_id_t* {.struct, impapi_typesHdr, importc: "struct tm_tt_id_t".} = object
     u64*: uint64 
 
   tm_tt_undo_scope_t* {.struct, impapi_typesHdr, importc: "struct tm_tt_undo_scope_t".} = object
