@@ -42,8 +42,11 @@ type
   tm_tt_type_t* {.struct, impapi_typesHdr, importc: "struct tm_tt_type_t".} = object
     u64*: uint64
 
-  tm_tt_id_t* {.struct, impapi_typesHdr, importc: "struct tm_tt_id_t".} = object
+  tm_tt_id_t* {.struct, union, impapi_typesHdr, importc: "struct tm_tt_id_t".} = object
     u64*: uint64 
+    `type`*: uint64
+    generation*: uint64
+    index*: uint64
 
   tm_tt_undo_scope_t* {.struct, impapi_typesHdr, importc: "struct tm_tt_undo_scope_t".} = object
     u64*: uint64
@@ -53,21 +56,12 @@ type
   
   tm_strhash_t* {.importc.} = distinct uint64
 
-proc TtId*(`type`, generation, index: uint64): tm_tt_id_t {.inline.} = 
-  result.u64 = ((`type` and 0x3ff'u64) shl 54) or 
-    ((generation and 0x3f_ffff'u64) shr 32) or 
-    (index and 0xffff_ffff'u64)
+proc tt_id*(`type`, generation, index: uint64): tm_tt_id_t {.inline.} = 
+  result.`type` = `type`
+  result.generation = generation
+  result.index = index
 
-proc `type`*(id: tm_tt_id_t): uint64 {.inline.} =
-  id.u64 and 0x3ff
-
-proc generation*(id: tm_tt_id_t): uint64 {.inline.} = 
-  (id.u64 shr 10) and 0x3f_ffff'u64
-
-proc index*(id: tm_tt_id_t): uint64 {.inline.} =
-  (id.u64 shr 32)
-
-converter toTtType*(id: tm_tt_id_t): tm_tt_type_t {.inline.} =
+converter to_tt_type*(id: tm_tt_id_t): tm_tt_type_t {.inline.} =
   tm_tt_type_t(u64: id.`type`)
 
 proc TM_VERSION*(major, minor, patch: uint32): tm_version_t {.inline.} =
