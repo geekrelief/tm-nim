@@ -7,7 +7,8 @@ proc tm_load_plugin(reg: ptr tm_api_registry_api, load: bool) {.callback.} =
   if load: 
     NimMain()
 
-  let logger = cast[ptr tm_logger_api](reg[].get("tm_logger_api", tm_logger_api_version))
+  let logger = reg.tm_get_api(tm_logger_api)
+
   if load:
     logger.print(TM_LOG_TYPE_INFO, "...TCC compiled")
   

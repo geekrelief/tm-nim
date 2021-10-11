@@ -4,8 +4,6 @@
 import nimterop/[cimport, paths]
 import os, strformat, sugar, strutils, sequtils, macros
 
-import globals
-
 static:
   #cDebug()
   cDisableCaching()
@@ -19,11 +17,12 @@ proc getHeaders():seq[string] =
 cExclude("api_types.h")
 cIncludeDir(r".")
 cDefine("TM_LINKS_FOUNDATION")
-cDefine("_MSC_VER")
+when defined(vcc) or defined(tcc):
+  cDefine("_MSC_VER")
 cDefine("TM_OS_WINDOWS")
 
 #cImport(filenames = static(getHeaders()), nimFile = "tm.nim")
 cImport( flags = "-E_ -F_ -G__=_", recurse = true,
-  nimFile = "tm_generated.nim", 
+  nimFile = "api/tm_generated.nim", 
   filenames = static(getHeaders())
 )

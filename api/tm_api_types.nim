@@ -1,7 +1,3 @@
-import globals 
-
-doAssert defined(windows), "Only tested on Windows"
-
 {.push hint[XDeclaredButNotUsed]:false.}
 {.pragma: struct, bycopy, completeStruct.}
 {.pragma: impapi_typesHdr, header: tm_dir & "api_types.h".}
@@ -54,7 +50,9 @@ type
   tm_version_t* {.struct, impapi_typesHdr, importc:"struct tm_version_t".} = object
     major*, minor*, patch*: uint32 
   
-  tm_strhash_t* {.importc.} = distinct uint64
+  #tm_strhash_t* {.importc.} = distinct uint64
+  tm_strhash_t* {.struct, impapi_typesHdr, importc:"struct tm_strhash_t".} = object
+    u64*: uint64
 
 proc tt_id*(`type`, generation, index: uint64): tm_tt_id_t {.inline.} = 
   result.`type` = `type`
