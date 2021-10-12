@@ -1,8 +1,6 @@
-doAssert defined(windows), "Only tested on Windows"
-
-include tm_api_types
+include api_types
 include tm_generated
-include tm_api_registry
+include api_registry
 
 template `$$`(s: untyped): untyped =
   cstring($s)

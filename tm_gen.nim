@@ -3,10 +3,9 @@
 
 import nimterop/[cimport, paths]
 import os, strformat, sugar, strutils, sequtils, macros
-import tm / tm_api_types
+import tm / api_types
 
 static:
-  #cDebug()
   cDisableCaching()
 
 proc getHeaders():seq[string] =

@@ -1,3 +1,5 @@
+import murmur2
+import macros
 {.push hint[XDeclaredButNotUsed]:false.}
 {.pragma: struct, bycopy, completeStruct.}
 {.pragma: impapi_typesHdr, header: tm_dir & "api_types.h".}
@@ -67,6 +69,9 @@ proc TM_VERSION*(major, minor, patch: uint32): tm_version_t {.inline.} =
 
 template TM_PAD*(n: uint32) =
   padding: array[n, char]
+
+macro TM_STATIC_HASH*(x: string): untyped =
+  result = newLit(murmurHash64A(x.strVal))
 
 const TM_PAGE_SIZE* = 4096
 
