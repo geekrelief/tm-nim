@@ -10,7 +10,7 @@ bin = @["tm_gen"]
 
 requires "nim >= 1.4.0"
 
-const dev = true
+const dev = false
 
 when not defined(dev):
   requires "https://github.com/geekrelief/nimterop#define"
