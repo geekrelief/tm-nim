@@ -1,2 +1,2 @@
-const cc* = "tcc" # select your compiler here
-const tm_dir* = "C:/tm/tm-nim/headers/"
+const cc* = "vcc" # only vcc supported
+const tm_headers_dir* = "C:/tm/tm-nim/headers/"

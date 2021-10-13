@@ -2,7 +2,7 @@ import murmur2
 import macros
 {.push hint[XDeclaredButNotUsed]:false.}
 {.pragma: struct, bycopy, completeStruct.}
-{.pragma: impapi_typesHdr, header: tm_dir & "api_types.h".}
+{.pragma: impapi_typesHdr, header: tm_headers_dir & "foundation/api_types.h".}
 
 type
   tm_vec2_t* {.struct, impapi_typesHdr, importc: "struct tm_vec2_t".} = object
@@ -51,10 +51,8 @@ type
 
   tm_version_t* {.struct, impapi_typesHdr, importc:"struct tm_version_t".} = object
     major*, minor*, patch*: uint32 
-  
-  #tm_strhash_t* {.importc.} = distinct uint64
-  tm_strhash_t* {.struct, impapi_typesHdr, importc:"struct tm_strhash_t".} = object
-    u64*: uint64
+
+  tm_strhash_t* {.importc.} = distinct uint64
 
 proc tt_id*(`type`, generation, index: uint64): tm_tt_id_t {.inline.} = 
   result.`type` = `type`
@@ -70,8 +68,13 @@ proc TM_VERSION*(major, minor, patch: uint32): tm_version_t {.inline.} =
 template TM_PAD*(n: uint32) =
   padding: array[n, char]
 
-macro TM_STATIC_HASH*(x: string): untyped =
-  result = newLit(murmurHash64A(x.strVal))
+macro TM_STATIC_HASH*(x: string, h: uint64 = 0): untyped =
+  var hashLit = 
+    if h.intVal == 0: 
+      newLit(murmurHash64A(x.strVal)) 
+    else: 
+      h
+  result = newTree(nnkCast, ident("tm_strhash_t"), hashLit)
 
 const TM_PAGE_SIZE* = 4096
 

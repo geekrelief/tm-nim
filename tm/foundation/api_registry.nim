@@ -12,3 +12,10 @@ template tm_set_or_remove_api(reg: ptr tm_api_registry_api, load: bool, TYPE: un
     reg[].set(astToStr(TYPE), `TYPE version`, impl, sizeof(impl))
   else:
     reg[].remove(impl)
+
+template tm_add_or_remove_implementation(reg: ptr tm_api_registry_api, load: bool, TYPE: untyped, impl: untyped) =
+  let p = cast[pointer](impl)
+  if load: 
+    reg[].add_implementation(astToStr(TYPE), `TYPE version`, impl)
+  else:
+    reg[].remove_implementation(astToStr(TYPE), `TYPE version`, impl)
