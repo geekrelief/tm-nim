@@ -2,27 +2,24 @@
 include tm
 
 import strformat
-
-const version = TM_VERSION(0, 1, 0)
-
-var logger: ptr tm_logger_api
-var count = 0
+const 
+  version = TM_VERSION(0, 1, 0)
+var 
+  logger: ptr tm_logger_api
+  count = 0
 
 proc start(args: ptr tm_simulation_start_args_t): ptr tm_simulation_state_o {.cdecl.} =
-  let state = cast[ptr tm_simulation_state_o](tm_alloc(args[].allocator, sizeof(tm_simulation_state_o).uint64))
-  state[] = tm_simulation_state_o(allocator: args[].allocator)
+  result = tm_alloc(args[].allocator, tm_simulation_state_o(allocator: args[].allocator))
   logger.print(TM_LOG_TYPE_INFO, $<"start simulation")
-  state
 
 proc stop(state: ptr tm_simulation_state_o, commands: ptr tm_entity_commands_o) {.cdecl.} =
-  let a = state[].allocator
-  tm_free(a, state, sizeof(state[]).uint64)
+  tm_free(state[].allocator, state)
   logger.print(TM_LOG_TYPE_INFO, $<"stop simulation")
 
 proc tick(state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t) {.cdecl.} =
   # called once a frame
   inc count
-  logger.print(TM_LOG_TYPE_INFO, $< &"tick {count=}!")
+  logger.print(TM_LOG_TYPE_INFO, $< &"!!tock {count=}!")
 
 var simulation_entry_i = tm_simulation_entry_i(
   id: TM_STATIC_HASH("tm_custom_simulation_entry"),
