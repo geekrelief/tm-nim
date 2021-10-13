@@ -8,15 +8,15 @@ var
   logger: ptr tm_logger_api
   count = 0
 
-proc start(args: ptr tm_simulation_start_args_t): ptr tm_simulation_state_o {.cdecl.} =
+proc start (args: ptr tm_simulation_start_args_t): ptr tm_simulation_state_o {.cdecl.} =
   result = tm_alloc(args[].allocator, tm_simulation_state_o(allocator: args[].allocator))
-  logger.print(TM_LOG_TYPE_INFO, $<"start simulation")
+  logger.print(TM_LOG_TYPE_INFO, $<"start simulation!")
 
-proc stop(state: ptr tm_simulation_state_o, commands: ptr tm_entity_commands_o) {.cdecl.} =
+proc stop (state: ptr tm_simulation_state_o, commands: ptr tm_entity_commands_o) {.cdecl.} =
   tm_free(state[].allocator, state)
   logger.print(TM_LOG_TYPE_INFO, $<"stop simulation")
 
-proc tick(state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t) {.cdecl.} =
+proc tick (state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t) {.cdecl.} =
   # called once a frame
   inc count
   logger.print(TM_LOG_TYPE_INFO, $< &"!!tock {count=}!")

@@ -13,7 +13,7 @@ requires "nim >= 1.4.0"
 const dev = false
 
 when not defined(dev):
-  requires "https://github.com/geekrelief/nimterop#define"
+  requires "https://github.com/geekrelief/nimterop >= 0.8.0"
 
 import globals
 import strformat
@@ -26,16 +26,16 @@ task gen, "(dev) Generate the binding":
     exec &"nim c tm_gen.nim"
 
 proc commonFlags(): seq[string] =
+  let cc = "vcc" # tcc doesn't like pragma once, getting undefined errors with gcc linker again
   var flags = @[&"--cc:{cc}"]
 
   flags.add case cc:
-    of "tcc":
-      "--threads:off --tlsEmulation:on"
     of "vcc":
-      "--passC:\"/wd4311 /wd4312 /wd4103\" " & #ignore 4311:pointer truncation, 4312: conversion of pointer to greater size, 4103: alignment changed after including header  
+      #ignore 4311:pointer truncation, 4312: conversion of pointer to greater size, 4103: alignment changed after including header (windows header warnings)
+      # 4133: incompatible types for proc callback, 4028: parameter different from declaration ({.header, importc.} warnings)
+      "--passC:\"/wd4311 /wd4312 /wd4103 /wd4133 /wd4028\"" & 
       "--threads:on --tlsEmulation:off"
-    of "gcc":
-      "--threads:on --tlsEmulation:off"
+    #[of "gcc": "--threads:on --tlsEmulation:off" ]#
     else: 
       raise newException(Defect, cc & " is not supported.")
 

@@ -18,7 +18,7 @@ static:
 cOverride:
   # used in custom_simulation_entry
   type
-    tm_simulation_state_o* = object
+    tm_simulation_state_o* {.completeStruct.} = object
       allocator: ptr tm_allocator_i
 
 cExclude(tm_headers_dir & "foundation/api_types.h")
