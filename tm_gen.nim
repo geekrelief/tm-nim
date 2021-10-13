@@ -27,7 +27,7 @@ cDefine("TM_LINKS_FOUNDATION")
 cDefine("_MSC_VER") # only works with vcc, other compilers not supported
 cDefine("TM_OS_WINDOWS")
 
-cImport( flags = "-E_ -F_ -G__=_", recurse = true,
+cImport( flags = "-c -E_ -F_ -G__=_", recurse = true,
   nimFile = "tm/tm_generated.nim", 
   filenames = static(getHeaders(tm_headers_dir))
 )

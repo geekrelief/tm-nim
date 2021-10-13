@@ -13,7 +13,7 @@ requires "nim >= 1.4.0"
 const dev = false
 
 when not defined(dev):
-  requires "https://github.com/geekrelief/nimterop >= 0.8.0"
+  requires "https://github.com/geekrelief/nimterop >= 0.8.1"
 
 import globals
 import strformat
