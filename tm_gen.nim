@@ -15,7 +15,7 @@ proc getHeaders(dir: string): seq[string] =
 static:
   cDisableCaching()
 
-include "override.nim"
+include "tm_gen_override.nim"
 
 cExclude(tm_headers_dir & "foundation/api_types.h")
 cIncludeDir(tm_headers_dir)

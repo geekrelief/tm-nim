@@ -15,3 +15,4 @@ Note: Only works with vcc on Windows.
 - Copy the header file to the headers dir.
 - Run `nimble gen`
   - If you get an `Error: undeclared identifier ...` about an opaque type, ending in `_o`, override it in `tm_gen_override.nim`, and run `nimble gen` again.
+  - opaque types from The Machinery that are meant to be defined by the user should be object types marked with `{.inheritable.}` and with the subtypes defined in your plugin code.
