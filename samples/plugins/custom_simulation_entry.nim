@@ -23,7 +23,7 @@ proc tick (state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_
   inc s.count
   log.info(&"tick {s.count}!")
 
-var simulation_entry_i = tm_simulation_entry_i(
+let simulation_entry_i = tm_simulation_entry_i(
   id: TM_STATIC_HASH("tm_custom_simulation_entry"),
   display_name: "Custom Simulation Entry",
   start: start,

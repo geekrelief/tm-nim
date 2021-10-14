@@ -23,7 +23,7 @@ macro tm_add_or_remove_impl(reg: ptr tm_api_registry_api, load: bool, impl: type
   let typeName = repr(getTypeInst(impl))
   let typeId = ident(typeName)
   result = genAst(reg, load, typeName, typeId, impl):
-    let p = impl.addr
+    let p = impl.unsafeAddr
     if load: 
       reg[].add_implementation(typeName, `typeId version`, p)
     else:
