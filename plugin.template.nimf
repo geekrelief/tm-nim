@@ -1,0 +1,12 @@
+#? stdtmpl()
+#proc plugin(): string =
+include tm
+
+const version = TM_VERSION(0, 1, 0)
+var log: ptr tm_logger_api
+
+proc tm_load_plugin(reg: ptr tm_api_registry_api, load: bool) {.callback.} =
+  if load: 
+    NimMain()
+
+  reg.tm_get_api_for(log)

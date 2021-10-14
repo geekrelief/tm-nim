@@ -1,8 +1,8 @@
 import globals
-switch("c") # Compile only. We don't need to generate tm_gen.exe. It doesn't do anything.
-switch("cc", "vcc")
-switch("gc", "arc")
-switch("include", "./globals.nim")
+--compileOnly:on # We don't need to generate tm_gen.exe. It doesn't do anything.
+--cc:vcc
+--gc:arc
+--"include":"./globals.nim"
 
 when defined(dev):
-  switch("path", "../gr-nimterop")
+  --path:"../gr-nimterop"

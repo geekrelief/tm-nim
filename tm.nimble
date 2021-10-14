@@ -16,8 +16,12 @@ when not defined(dev):
   requires "https://github.com/geekrelief/nimterop >= 0.8.1"
 
 import globals
-import strformat
+import strformat, strutils
 import os
+
+proc taskParams(): seq[string] = # nimble's paramCount / paramStr is broken in v0.13.1
+  var params = commandLineParams()
+  params[8 .. ^2]
 
 task gen, "(dev) Generate the binding":
   if dev:
@@ -48,10 +52,28 @@ proc buildProject(nimFilePath, outDir: string): void =
   mkdir(outDir)
   exec &"nim c {settings.join(\" \")} {nimFilePath}"
 
+task new, "Creates scaffolding for new plugin":
+  var params = taskParams()
+  if params.len != 1:
+    echo "Usage: nimble new -- [path]"
+    return
+
+  var filename = params[0]
+  if not filename.endsWith(".nim"): filename &= ".nim"
+  filename = filename.absolutePath
+  echo &"Writing new plugin to: {filename}"
+
+  include "plugin.template.nimf"
+
+  writeFile(filename, plugin())
+
+### TM Plugins
+
+let samples_dir = "samples/plugins/"
+
 task minimal, "Build the minimal sample":
-  buildProject("samples/plugins/minimal.nim", "C:/tm/gr-tm/bin/Debug/plugins")
+  buildProject(samples_dir & "minimal.nim", "C:/tm/gr-tm/bin/Debug/plugins")
 
 task simentry, "Build the simulation entry sample":
-  buildProject(
-    "samples/plugins/custom_simulation_entry.nim", 
+  buildProject(samples_dir & "custom_simulation_entry.nim", 
     "C:/tm/tm-nim/build/samples/plugins/simulation")
