@@ -8,7 +8,7 @@ license       = "MIT"
 bin = @["tm_gen"]
 # Dependencies
 
-requires "nim >= 1.4.0"
+requires "nim >= 1.5.1"
 
 const dev = false
 
