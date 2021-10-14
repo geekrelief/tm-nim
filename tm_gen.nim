@@ -16,10 +16,12 @@ static:
   cDisableCaching()
 
 cOverride:
-  # used in custom_simulation_entry
+  # TM uses a lot of opaque ptrs, typedefs with _o suffix.
+  # Overriding their definition using inheritance, object of RootObj,
+  # makes it easy to create multiple definitions in Nim to interop with C.
+  # So we can have one, tm_generated.nim, for multiple plugins.
   type
-    tm_simulation_state_o* {.completeStruct.} = object
-      allocator: ptr tm_allocator_i
+    tm_simulation_state_o* = object of RootObj
 
 cExclude(tm_headers_dir & "foundation/api_types.h")
 cIncludeDir(tm_headers_dir)
