@@ -61,6 +61,15 @@ task new, "Creates scaffolding for new plugin":
   var filename = params[0]
   if not filename.endsWith(".nim"): filename &= ".nim"
   filename = filename.absolutePath
+  let (path, name, ext) = filename.splitFile
+  if not dirExists(path):
+    echo &"{path} does not exist.  Would you like to create it (y/n)?"
+    let answer = readLineFromStdin()
+    if answer == "y":
+      mkDir(path)
+    else:
+      return
+
   if fileExists(filename):
     echo &"Error: {filename} exists."
     return
