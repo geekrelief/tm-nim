@@ -61,10 +61,12 @@ task new, "Creates scaffolding for new plugin":
   var filename = params[0]
   if not filename.endsWith(".nim"): filename &= ".nim"
   filename = filename.absolutePath
+  if fileExists(filename):
+    echo &"Error: {filename} exists."
+    return
+
   echo &"Writing new plugin to: {filename}"
-
   include "plugin.template.nimf"
-
   writeFile(filename, plugin())
 
 ### TM Plugins
