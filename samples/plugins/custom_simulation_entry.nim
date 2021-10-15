@@ -21,7 +21,7 @@ proc stop (state: ptr tm_simulation_state_o, commands: ptr tm_entity_commands_o)
 proc tick (state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t) {.cdecl.} =
   let s = cast[ptr SimState](state)
   inc s.count
-  log.info(&"tick {s.count}!")
+  log.info(&"tick Count: {s.count}. Frame time: {args.dt:.2}")
 
 let simulation_entry_i = tm_simulation_entry_i(
   id: TM_STATIC_HASH("tm_custom_simulation_entry"),

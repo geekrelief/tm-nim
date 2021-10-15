@@ -5,4 +5,4 @@ cOverride:
   # So we can have one, tm_generated.nim, for multiple plugins.
   type
     tm_simulation_state_o* {.inheritable.} = object
-    tm_plugin_o* {.inheritable.} = object
+    tm_plugin_o* = object
