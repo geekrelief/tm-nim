@@ -34,6 +34,6 @@ proc tm_load_plugin(reg: ptr tm_api_registry_api, load: bool) {.callback.} =
   if load: 
     NimMain()
 
-  reg.tm_add_or_remove_impl(load, simulation_entry_i)
-  reg.tm_get_api_for(log)
+  reg.tm_add_or_remove_impl load, simulation_entry_i
+  reg.tm_get_api_for log
   log.info(&"{version=}: " & (if not load: "Unloading old plugin" else: "Hello from Custom simulation!"))

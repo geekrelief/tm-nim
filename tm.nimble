@@ -88,3 +88,6 @@ task minimal, "Build the minimal sample":
 task simentry, "Build the simulation entry sample":
   buildProject(samples_dir & "custom_simulation_entry.nim", 
     "C:/tm/tm-nim/build/samples/plugins/simulation")
+
+task callbacks, "Build the plugin_callbacks sample":
+  buildProject(samples_dir & "plugin_callbacks.nim", "C:/tm/gr-tm/bin/Debug/plugins")
