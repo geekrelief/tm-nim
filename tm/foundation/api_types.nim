@@ -1,5 +1,5 @@
 import murmur2
-import macros
+import macros {.all.}
 {.push hint[XDeclaredButNotUsed]:false.}
 {.pragma: struct, bycopy, completeStruct.}
 {.pragma: impapi_typesHdr, header: tm_headers_dir & "foundation/api_types.h".}

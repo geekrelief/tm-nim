@@ -8,12 +8,12 @@ license       = "MIT"
 bin = @["tm_gen"]
 # Dependencies
 
-requires "nim >= 1.5.1"
+requires "nim >= 1.6.0"
 
 const dev = false
 
 when not defined(dev):
-  requires "https://github.com/geekrelief/nimterop >= 0.8.1"
+  requires "https://github.com/geekrelief/nimterop >= 0.8.2"
 
 import globals
 import strformat, strutils
@@ -21,7 +21,11 @@ import os
 
 proc taskParams(): seq[string] = # nimble's paramCount / paramStr is broken in v0.13.1
   var params = commandLineParams()
-  params[8 .. ^2]
+  if params.len > 9:
+    params[8 .. ^2]
+  else:
+    @[]
+  
 
 task gen, "(dev) Generate the binding":
   if dev:
@@ -91,3 +95,6 @@ task simentry, "Build the simulation entry sample":
 
 task callbacks, "Build the plugin_callbacks sample":
   buildProject(samples_dir & "plugin_callbacks.nim", "C:/tm/gr-tm/bin/Debug/plugins")
+
+task component, "Build the custom component sample":
+  buildProject(samples_dir & "custom_component.nim", "C:/tm/tm-nim/build-samples/plugins/custom_component")

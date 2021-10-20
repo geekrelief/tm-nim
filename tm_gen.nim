@@ -2,20 +2,31 @@
 {.warning[UnusedImport]:false.}
 
 import nimterop/[cimport, paths]
-import os, strformat, sugar, strutils, sequtils, macros
+import os, strformat, sugar, strutils, sequtils
 import tm / foundation / api_types
 
 proc getHeaders(dir: string): seq[string] =
   result = collect:
     for path in walkDirRec(&"{dir}"):
       echo repr(path)
-      if path.endsWith(".h"):
+      if path.endsWith(".h") or path.endsWith(".inl"):
         path
 
 static:
   cDisableCaching()
 
 include "tm_gen_override.nim"
+#[
+cExclude(tm_headers_dir & "plugins/entity/entity.h")
+cExclude(tm_headers_dir & "plugins/entity/transform_component.h")
+cExclude(tm_headers_dir & "plugins/the_machinery_shared/component_interfaces/editor_ui_interface.h")
+
+cExclude(tm_headers_dir & "foundation/carray.inl")
+cExclude(tm_headers_dir & "foundation/math.inl")
+cExclude(tm_headers_dir & "foundation/the_truth.h")
+
+cExclude(tm_headers_dir & "foundation/localizer.h")
+]#
 
 cExclude(tm_headers_dir & "foundation/api_types.h")
 cIncludeDir(tm_headers_dir)
