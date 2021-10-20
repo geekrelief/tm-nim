@@ -1,11 +1,15 @@
 import std / [macros{.all.}, genasts, strformat]
 
-{.pragma: callback, exportc, cdecl, dynlib.} # used for TM caLlbacks
+macro callback*(def: untyped): untyped =
+  # adds {.exportc, cdecl, dynlib.}
+  # pragmas can't be exported from a module 
+  def.pragma = nnkPragma.newTree( ident("exportc"), ident("cdecl"), ident("dynlib"))
+  def
 
-proc NimMain() {.dynlib, exportc, cdecl, importc.} # call NimMain on plugin load
+proc NimMain*() {.dynlib, exportc, cdecl, importc.} # call NimMain on plugin load
 
 #used in macros
-proc hasPragma(n: NimNode, cpName: string): bool =
+proc hasPragma*(n: NimNode, cpName: string): bool =
   let pragmaNode = customPragmaNode(n)
   for p in pragmaNode:
     if (p.kind == nnkSym and p.strVal.eqIdent(cpName)) or
@@ -14,7 +18,7 @@ proc hasPragma(n: NimNode, cpName: string): bool =
   return false
 
 #used in macros
-proc getPragmaVal(n: NimNode, cpName: string):NimNode =
+proc getPragmaVal*(n: NimNode, cpName: string):NimNode =
   result = nil
   let pragmaNode = customPragmaNode(n)
   for p in pragmaNode:

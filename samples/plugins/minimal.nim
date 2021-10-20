@@ -1,4 +1,4 @@
-include tm
+import tm
 import strformat
 
 const version = TM_VERSION(0, 2, 0)

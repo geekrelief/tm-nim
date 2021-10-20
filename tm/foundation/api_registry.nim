@@ -17,13 +17,13 @@ template tm_get_optional_api*(reg: ptr tm_api_registry_api, TYPE: untyped): unty
 template tm_get_api_version*(reg: ptr tm_api_registry_api, TYPE: untyped, VERSION: tm_version_t): untyped =
   cast[ptr `TYPE`](reg[].get(astToStr(TYPE), VERSION))
 
-template tm_set_or_remove_api(reg: ptr tm_api_registry_api, load: bool, TYPE: untyped, impl: untyped): untyped = 
+template tm_set_or_remove_api*(reg: ptr tm_api_registry_api, load: bool, TYPE: untyped, impl: untyped): untyped = 
   if load:
     reg[].set(astToStr(TYPE), `TYPE version`, impl, sizeof(impl))
   else:
     reg[].remove(impl)
 
-macro tm_add_or_remove_impl(reg: ptr tm_api_registry_api, load: bool, impls: varargs[typed]): untyped =
+macro tm_add_or_remove_impl*(reg: ptr tm_api_registry_api, load: bool, impls: varargs[typed]): untyped =
   doAssert(impls.len > 0, "Missing impls")
   result = newNimNode(nnkStmtList)
   for impl in impls:
