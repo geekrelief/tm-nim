@@ -1,16 +1,17 @@
-template tm_get_api*(reg: ptr tm_api_registry_api, TYPE: untyped): untyped =
-  cast[ptr `TYPE`](reg.get(astToStr(TYPE), `TYPE version`))
+template tmGetApi*(reg: ptr tmApiRegistryApi, t: typed{type}): untyped =
+  cast[ptr `t`](reg.get(astToStr(t), `t version`))
 
-macro tm_get_api_for*(reg: ptr tm_api_registry_api, dests: varargs[typed]): untyped =
+macro tmGetApiFor*(reg: ptr tmApiRegistryApi, dests: varargs[typed]{`var` & noalias}): untyped =
   doAssert(dests.len > 0, "Missing arguments")
   result = newNimNode(nnkStmtList)
   for dest in dests:
     let ptrType = getTypeInst(dest)
-    let typeId = ptrType[0]
-    let ast = genAst(reg, typeId, typeName = typeId.strVal, dest):
-      dest = cast[ptr typeId](reg.get(typeName, `typeId version`))
-    result.add ast
+    doAssert(ptrType.kind == nnkPtrTy, &"{dest} must be a ptr to a TM type.")
+    let t = ptrType[0]
+    result.add genAst(reg, t, tname = t.strVal, dest) do:
+      dest = cast[ptr t](reg.get(tname, `t version`))
 
+#[
 template tm_get_optional_api*(reg: ptr tm_api_registry_api, TYPE: untyped): untyped =
   cast[ptr `TYPE`](reg[].get_optional(astToStr(TYPE), `TYPE version`))
 
@@ -22,28 +23,33 @@ template tm_set_or_remove_api*(reg: ptr tm_api_registry_api, load: bool, TYPE: u
     reg[].set(astToStr(TYPE), `TYPE version`, impl, sizeof(impl))
   else:
     reg[].remove(impl)
+]#
 
-macro tm_add_or_remove_impl*(reg: ptr tm_api_registry_api, load: bool, impls: varargs[typed]): untyped =
+macro tmAddOrRemoveImpl*(reg: ptr tmApiRegistryApi, load: bool, impls: varargs[typed]): untyped =
   doAssert(impls.len > 0, "Missing impls")
   result = newNimNode(nnkStmtList)
   for impl in impls:
-    let implType = getTypeImpl(impl)
-    var (typeName, p) = case implType.kind
+    let t = getTypeImpl(impl)
+    var (tname, p) = case t.kind:
       of nnkObjectTy:
          (repr(getTypeInst(impl)), newCall(ident("unsafeAddr"), impl))
       of nnkProcTy:
-        doAssert(impl.hasPragma("tm_type"), &"proc {impl.strVal} is missing \"tm_type\" pragma")
-        var pragmaType = impl.getPragmaVal("tm_type")
-        doAssert(pragmaType.symKind == nskType, &"proc {impl.strVal} \"tm_type\" argument must be a type")
-        doAssert(pragmaType.getImpl[2].kind == nnkProcTy, &"{{.tm_type: {pragmaType.repr}.}} must be a proc type for: proc {impl.strVal}")
-        (impl.getPragmaVal("tm_type").repr, impl)
-      else:
-        doAssert false, repr(impl) & " must be an object or proc type."
-        ("", nil)
+        doAssert(impl.hasPragma("tmType"), &"proc {impl.strVal} is missing \"tmType\" pragma")
+        var pragmaType = impl.getPragmaVal("tmType")
+        doAssert(pragmaType.symKind == nskType, &"proc {impl.strVal} \"tmType\" argument must be a type")
+        var tmType = pragmaType.getImpl()
 
-    var typeVersion = ident(typeName & "version")
-    result.add genAst(reg, load, typeName, typeVersion, p) do:
-      if load: 
-        reg[].add_implementation(typeName, typeVersion, p)
+        if tmType.kind == nnkTypeDef:
+          while (tmType[2].kind == nnkSym):
+            tmType = getImpl(tmType[2])
+
+          doAssert(tmType.kind == nnkTypeDef and tmType[2].kind == nnkProcTy, &"{{.tmType: {pragmaType.repr}.}} must be a proc type for: proc {impl.strVal}")
+        (pragmaType.repr, impl)
       else:
-        reg[].remove_implementation(typeName, typeVersion, p)
+        raise newException(Defect, &"{impl.repr} must be an object or proc")
+
+    result.add genAst(reg, load, tname, tversion = ident(tname & "version"), p) do:
+      if load: 
+        reg[].addImplementation(tname, tversion, p)
+      else:
+        reg[].removeImplementation(tname, tversion, p)

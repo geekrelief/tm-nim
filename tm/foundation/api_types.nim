@@ -54,6 +54,8 @@ type
 
   tm_strhash_t* {.importc.} = distinct uint64
 
+proc `==`*(a, b: tm_strhash_t): bool {.borrow.}
+
 proc tt_id*(`type`, generation, index: uint64): tm_tt_id_t {.inline.} = 
   result.`type` = `type`
   result.generation = generation
@@ -65,10 +67,7 @@ converter to_tt_type*(id: tm_tt_id_t): tm_tt_type_t {.inline.} =
 proc TM_VERSION*(major, minor, patch: uint32): tm_version_t {.inline.} =
   tm_version_t(major: major, minor: minor, patch: patch)
 
-template TM_PAD*(n: uint32) =
-  padding: array[n, char]
-
-macro TM_STATIC_HASH*(x: string, h: uint64 = 0): untyped =
+macro TM_STATIC_HASH*(x: string, h: uint64 = 0): tm_strhash_t =
   var hashLit = 
     if h.intVal == 0: 
       newLit(murmurHash64A(x.strVal)) 
@@ -78,6 +77,7 @@ macro TM_STATIC_HASH*(x: string, h: uint64 = 0): untyped =
 
 const TM_PAGE_SIZE* = 4096
 
+#== helpers ==
 proc vec2*(x, y: float): tm_vec2_t {.inline.} =
   tm_vec2_t(x: x, y: y)
 

@@ -9,6 +9,7 @@ bin = @["tm_gen"]
 # Dependencies
 
 requires "nim >= 1.6.0"
+requires "ptr_math >= 0.3.0"
 
 const dev = false
 
@@ -18,6 +19,10 @@ when not defined(dev):
 import globals
 import strformat, strutils
 import os
+
+const samples_dir = "samples/plugins/"
+const build_dir = "C:/tm/tm-nim/build-samples/plugins/"
+const tm_plugins_dir = "C:/tm/gr-tm/bin/Debug/plugins/"
 
 proc taskParams(): seq[string] = # nimble's paramCount / paramStr is broken in v0.13.1
   var params = commandLineParams()
@@ -41,8 +46,8 @@ proc commonFlags(): seq[string] =
     of "vcc":
       #ignore 4311:pointer truncation, 4312: conversion of pointer to greater size, 4103: alignment changed after including header (windows header warnings)
       # 4133: incompatible types for proc callback, 4028: parameter different from declaration ({.header, importc.} warnings)
-      "--passC:\"/wd4311 /wd4312 /wd4103 /wd4133 /wd4028\"" & 
-      "--threads:on --tlsEmulation:off"
+      "--passC:\"/wd4311 /wd4312 /wd4103 /wd4133 /wd4028\" " & 
+      "--threads:on --tlsEmulation:off "
     #[of "gcc": "--threads:on --tlsEmulation:off" ]#
     else: 
       raise newException(Defect, cc & " is not supported.")
@@ -50,11 +55,18 @@ proc commonFlags(): seq[string] =
   flags &= @["--app:lib", "--gc:arc", "-d:danger", "--nomain:on", "--include:globals.nim", "--path:.", "--path:tm", "--path:samples"]
   flags
 
-proc buildProject(nimFilePath, outDir: string): void =
-  var (dir, name, ext) = splitFile(nimFilePath)
-  let settings = commonFlags() & &"-o:tm_{name}.dll --outdir:\"{outDir}\""
-  mkdir(outDir)
+
+proc buildProject(name, targetDir: string = ""): void =
+  let nimFilePath = samples_dir & name & ".nim"
+  let dll = &"tm_{name}.dll"
+  let settings = commonFlags() & &"-o:{dll} --outdir:\"{build_dir}\""
+  mkdir(build_dir & name)
   exec &"nim c {settings.join(\" \")} {nimFilePath}"
+  var targetDir = if targetDir.len == 0: tm_plugins_dir else: targetDir
+  targetDir.normalizePathEnd(true)
+  mkdir(targetDir)
+  if build_dir != targetDir:
+    cpFile(build_dir & dll, targetDir & dll)
 
 task new, "Creates scaffolding for new plugin":
   var params = taskParams()
@@ -84,17 +96,15 @@ task new, "Creates scaffolding for new plugin":
 
 ### TM Plugins
 
-let samples_dir = "samples/plugins/"
 
 task minimal, "Build the minimal sample":
-  buildProject(samples_dir & "minimal.nim", "C:/tm/gr-tm/bin/Debug/plugins")
+  buildProject("minimal")
 
 task simentry, "Build the simulation entry sample":
-  buildProject(samples_dir & "custom_simulation_entry.nim", 
-    "C:/tm/tm-nim/build/samples/plugins/simulation")
+  buildProject("custom_simulation_entry", "C:/tm/tm-nim/build/samples/plugins/simulation/")
 
 task callbacks, "Build the plugin_callbacks sample":
-  buildProject(samples_dir & "plugin_callbacks.nim", "C:/tm/gr-tm/bin/Debug/plugins")
+  buildProject("plugin_callbacks")
 
 task component, "Build the custom component sample":
-  buildProject(samples_dir & "custom_component.nim", "C:/tm/tm-nim/build-samples/plugins/custom_component")
+  buildProject("custom_component", "C:/tm/tm-nim/build/samples/plugins/custom_component/")

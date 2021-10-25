@@ -1,9 +1,15 @@
-import std / [macros{.all.}, genasts, strformat]
+import std / [
+  macros{.all.}, 
+  genasts, 
+  strformat
+  ]
+import ptr_math
+export ptr_math
 
 macro callback*(def: untyped): untyped =
-  # adds {.exportc, cdecl, dynlib.}
+  # adds {.exportc:"tm_load_plugin", cdecl, dynlib.}
   # pragmas can't be exported from a module 
-  def.pragma = nnkPragma.newTree( ident("exportc"), ident("cdecl"), ident("dynlib"))
+  def.pragma = nnkPragma.newTree( nnkExprColonExpr.newTree(ident("exportc"), newLit("tm_load_plugin")), ident("cdecl"), ident("dynlib"))
   def
 
 proc NimMain*() {.dynlib, exportc, cdecl, importc.} # call NimMain on plugin load
@@ -37,12 +43,22 @@ proc getPragmaVal*(n: NimNode, cpName: string):NimNode =
     error(n.repr & " doesn't have a pragma named " & cpName) # returning an empty node results in most cases in a cryptic error,
 
 # used to map nim procs to TM function typedef (which is not a function pointer!)
-template tm_type*(T: typedesc) {.pragma.}
+template tmType*(T: typedesc) {.pragma.}
 
-include foundation/api_types
+func toArray*[T](n: static int, a: varargs[T]): array[n, T] =
+  for i, x in a:
+    result[i] = x
+
+include foundation / api_types
 include tm_generated
-include foundation / api_registry
-include foundation / allocator
-include foundation / log
-include foundation / localizer
-include foundation / the_truth
+include foundation / [
+  api_registry, 
+  allocator, 
+  temp_allocator,
+  log,
+  localizer,
+  the_truth,
+  carray
+  ]
+
+include plugin / [ entity ]

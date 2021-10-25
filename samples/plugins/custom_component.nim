@@ -1,18 +1,19 @@
 import tm
+import std / [math]
 
-const version = TM_VERSION(0, 1, 0)
+const version = TmVersion(0, 1, 0)
 
 var 
-  entity: ptr tm_entity_api
-  transformComponent: ptr tm_transform_component_api
-  tempAllocator: ptr tm_temp_allocator_api
-  truth: ptr tm_the_truth_api
-  localizer: ptr tm_localizer_api
-  log: ptr tm_logger_api
+  entity: ptr tmEntityApi
+  transformComponent: ptr tmTransformComponentApi
+  tempAllocator: ptr tmTempAllocatorApi
+  truth: ptr tmTheTruthApi
+  localizer: ptr tmLocalizerApi
+  log: ptr tmLoggerApi
 
 const
-  ttTypeCustomComponent = "tm_custom_component"
-  ttTypeHashCustomComponent = TM_STATIC_HASH(ttTypeCustomComponent)
+  TtTypeCustomComponent = "custom_component"
+  TtTypeHashCustomComponent = TmStaticHash(TtTypeCustomComponent)
 
 type
   CustomComponentE = enum
@@ -23,46 +24,95 @@ type
     y0, frequency, amplitude: float
 
 proc componentCategory(): cstring {.cdecl.} =
-  localizer.TM_LOCALIZE("Samples")
+  localizer.TmLocalize("Samples")
 
-let editor_aspect = tm_ci_editor_ui_i(category: componentCategory)
+let editor_aspect = tmCiEditorUiI(category: componentCategory)
 
 # Use the "tm_type" pragma to map our proc to a TM function typedef (note TM's function typedef is not a function pointer!)
-proc truthCreateTypes(tt: ptr tm_the_truth_o) {.cdecl, tm_type: tm_the_truth_create_types_i.}  =
+proc truthCreateTypes(tt: ptr tmTheTruthO) {.cdecl, tmType: tmTheTruthCreateTypesI.}  =
   let customComponentProperties = [
-    tm_the_truth_property_definition_t(name: "frequency", `type`: TM_THE_TRUTH_PROPERTY_TYPE_FLOAT),
-    tm_the_truth_property_definition_t(name: "amplitude", `type`: TM_THE_TRUTH_PROPERTY_TYPE_FLOAT)
+    tmTheTruthPropertyDefinitionT(name: "frequency", `type`: TmTheTruthPropertyTypeFloat),
+    tmTheTruthPropertyDefinitionT(name: "amplitude", `type`: TmTheTruthPropertyTypeFloat)
   ]
 
   let 
-    customComponentType = truth.create_object_type(tt, ttTypeCustomComponent, customComponentProperties[0].unsafeAddr, customComponentProperties.len.uint32)
-    defaultObject = truth.quick_create_object(tt, TM_TT_NO_UNDO_SCOPE, ttTypeHashCustomComponent,
+    customComponentType = truth.createObjectType(tt, TtTypeCustomComponent, customComponentProperties[0].unsafeAddr, customComponentProperties.len.uint32)
+    defaultObject = truth.quickCreateObject(tt, TmTtNoUndoScope, TtTypeHashCustomComponent,
       Frequency, 1.0, Amplitude, 1.0, -1)
   truth.set_default_object(tt, customComponentType, defaultObject)
-  truth.set_aspect(tt, customComponentType, TM_CI_EDITOR_UI, editor_aspect.unsafeAddr)
+  truth.set_aspect(tt, customComponentType, TmCiEditorUi, editor_aspect.unsafeAddr)
 
 
-proc componentLoadAsset(man: ptr tm_component_manager_o, commands: ptr tm_entity_commands_o, e: tm_entity_t, c_vp: pointer, tt: ptr tm_the_truth_o, asset: tm_tt_id_t): bool {.cdecl.} =
+proc componentLoadAsset(man: ptr tmComponentManagerO, commands: ptr tmEntityCommandsO, e: tmEntityT, cVp: pointer, tt: ptr tmTheTruthO, asset: tmTtIdT): bool {.cdecl.} =
   var 
-    c = cast[ptr CustomComponentT](c_vp)
-    assetR: ptr tm_the_truth_object_o = truth.read(tt, asset)
+    c = cast[ptr CustomComponentT](cVp)
+    assetR: ptr tmTheTruthObjectO = truth.read(tt, asset)
   c.y0 = 0
-  c.frequency = truth.get_float(tt, assetR, Frequency.uint32)
-  c.amplitude = truth.get_float(tt, assetR, Amplitude.uint32)
+  c.frequency = truth.getFloat(tt, assetR, Frequency.uint32)
+  c.amplitude = truth.getFloat(tt, assetR, Amplitude.uint32)
   true
 
-proc componentCreate(ctx: ptr tm_entity_context_o) {.cdecl.} =
-  let component = tm_component_i(
-    name: ttTypeCustomComponent,
+proc componentCreate(ctx: ptr tmEntityContextO) {.cdecl, tmType: tmEntityCreateComponentI.} =
+  let component = tmComponentI(
+    name: TtTypeCustomComponent,
     bytes: sizeof(CustomComponentT).uint32,
     load_asset: componentLoadAsset)
-  discard entity.register_component(ctx, component.unsafeAddr)
+  discard entity.registerComponent(ctx, component.unsafeAddr)
+
+proc engineUpdateCustom(inst: ptr tmEngineO, data: ptr tmEngineUpdateSetT, commands: ptr tmEntityCommandsO) {.cdecl.} =
+  var 
+    ta = tempAllocator.initTempAllocator()
+    modTransform: ptr tmEntityT
+    ctx = cast[ptr tmEntityContextO](inst)
+    t = 0'f64
+  
+  var bb: ptr tmEntityBlackboardValueT = data.blackboardStart
+  while bb != data.blackboardEnd:
+    if bb.id == TmEntityBbTime: t = bb.doubleValue
+    bb += 1
+
+  var a: ptr tmEngineUpdateArrayT = data.arrays
+  var dataEnd = data.arrays[data.numArrays.int].addr
+  while a != dataEnd:
+    var
+      custom = cast[ptr CustomComponentT](a.components[0])
+      transform = cast[ptr tmTransformComponentT](a.components[1])
+    for i in 0..<a.n:
+      if custom[i.int].y0 == 0.0:
+        custom[i.int].y0 = transform[i.int].world.pos.y
+      let y = custom[i.int].y0 + custom[i.int].amplitude * sin(float(t) * custom[i.int].frequency)
+      transform[i.int].world.pos.y = y
+      inc transform[i.int].version
+      discard tmCarrayTempPush(modTransform, a.entities[i.int], ta)
+    a += 1
+  
+  entity.notify(ctx, data.engine.components[1], modTransform, tmCarraySize(modTransform).uint32)
 
 
-proc tm_load_plugin(reg: ptr tm_api_registry_api, load: bool) {.callback.} =
+proc engineFilterCustom(inst: ptr tmEngineO, components: ptr tmComponentTypeT, numComponents: uint32, mask: ptr tmComponentMaskT): bool {.cdecl.} =
+  tmEntityMaskHasComponent(mask, components[0]) and tmEntityMaskHasComponent(mask, components[1])
+
+proc componentRegisterEngine(ctx: ptr tmEntityContextO) {.tmType: tmEntityRegisterEnginesSimulationI} =
+  let
+    customComponent = entity.lookupComponentType(ctx, TtTypeHashCustomComponent)
+    transformComponent = entity.lookupComponentType(ctx, TmTtTypeHashTransformComponent)
+  
+  var e = initEngineI(
+    uiName = "Custom Component",
+    hash = TmStaticHash("TM_ENGINE__CUSTOM_COMPONENT"),
+    components = [customComponent, transformComponent],
+    writes = [false, true],
+
+    update = engineUpdateCustom,
+    filter = engineFilterCustom,
+    inst = ctx,
+  )
+  entity.registerEngine(ctx, e.unsafeAddr)
+
+proc tmLoadPlugin(reg: ptr tm_api_registry_api, load: bool) {.callback.} =
   if load: 
     NimMain()
 
-  reg.tm_get_api_for entity, transformComponent, tempAllocator, truth, localizer, log
+  reg.tmGetApiFor entity, transformComponent, tempAllocator, truth, localizer, log
 
-  reg.tm_add_or_remove_impl load, truthCreateTypes
+  reg.tmAddOrRemoveImpl load, truthCreateTypes, componentCreate, componentRegisterEngine

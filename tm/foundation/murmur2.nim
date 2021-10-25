@@ -1,10 +1,10 @@
 # from https://github.com/cwpearson/nim-murmurhash/blob/master/src/murmurhash/murmur2.nim
 template `^=`(a, b) = a = a xor b
 
-template `+`*[T](p: ptr T, off: int): ptr T =
+template `+`[T](p: ptr T, off: int): ptr T =
   cast[ptr T](cast[ByteAddress](p) +% off * sizeof(T))
 
-template `[]`*[T](p: ptr T, off: int): T =
+template `[]`[T](p: ptr T, off: int): T =
   (p + off)[]
 
 
