@@ -21,7 +21,7 @@ import strformat, strutils
 import os
 
 const samples_dir = "samples/plugins/"
-const build_dir = "C:/tm/tm-nim/build-samples/plugins/"
+const build_dir = "C:/tm/tm-nim/build/samples/plugins/"
 const tm_plugins_dir = "C:/tm/gr-tm/bin/Debug/plugins/"
 
 proc taskParams(): seq[string] = # nimble's paramCount / paramStr is broken in v0.13.1
@@ -107,4 +107,5 @@ task callbacks, "Build the plugin_callbacks sample":
   buildProject("plugin_callbacks")
 
 task component, "Build the custom component sample":
-  buildProject("custom_component", "C:/tm/tm-nim/build/samples/plugins/custom_component/")
+  #buildProject("custom_component", "C:/tm/tm-nim/build/samples/plugins/custom_component/")
+  buildProject("custom_component")

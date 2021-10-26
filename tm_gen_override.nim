@@ -77,7 +77,35 @@ cOverride:
       set_io*: proc (inst: ptr tm_buffers_o; io: ptr tm_os_file_io_api) {.cdecl.}
     #<foundation/buffer.h
     
+    #>foundation/temp_allocator.h
+    tm_temp_allocator_api* {.bycopy, impcarrayHdr,
+                            importc: "struct tm_temp_allocator_api".} = object
+      create*: proc (backing: ptr tm_allocator_i): ptr tm_temp_allocator_i {.cdecl.}
+      create_in_buffer*: proc (buffer: ptr UncheckedArray[cchar]; size: uint64;
+                              backing: ptr tm_allocator_i): ptr tm_temp_allocator_i {.
+          cdecl.}
+      destroy*: proc (ta: ptr tm_temp_allocator_i) {.cdecl.}
+      allocator*: proc (a: ptr tm_allocator_i; ta: ptr tm_temp_allocator_i) {.
+          cdecl.}
+      frame_alloc*: proc (size: uint64): pointer {.cdecl.}
+      frame_allocator*: proc (): ptr tm_allocator_i {.cdecl.}
+      tick_frame*: proc () {.cdecl.}
+      printf*: proc (ta: ptr tm_temp_allocator_i; format: cstring): cstring {.
+          cdecl, varargs.}
+      vprintf*: proc (ta: ptr tm_temp_allocator_i; format: cstring; args: va_list): cstring {.
+          cdecl.}
+      frame_printf*: proc (format: cstring): cstring {.cdecl, varargs.}
+      frame_vprintf*: proc (format: cstring; args: va_list): cstring {.cdecl.}
+      statistics*: ptr tm_temp_allocator_statistics_t
+    #<foundation/temp_allocator.h
+
     #>plugin/entity.h
+
+    tm_entity_set_t* {.bycopy, impentityHdr, importc: "struct tm_entity_set_t".} = object
+      total_entities*: uint32
+      num_arrays*: uint32
+      arrays*: UncheckedArray[tm_entity_array_t]
+
     tm_engine_update_set_t* {.bycopy, impentityHdr,
                               importc: "struct tm_engine_update_set_t".} = object
       engine*: ptr tm_engine_i
@@ -87,7 +115,7 @@ cOverride:
       blackboard_end*: ptr tm_entity_blackboard_value_t
       num_arrays*: uint32
       padding_401*: array[4, cchar]
-      arrays*: ptr tm_engine_update_array_t
+      arrays*: UncheckedArray[tm_engine_update_array_t]
 
     tm_entity_system_i* {.bycopy, impentityHdr,
                           importc: "struct tm_entity_system_i".} = object

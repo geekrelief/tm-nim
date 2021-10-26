@@ -1,15 +1,16 @@
 type TempAllocator* = object
-  api: ptr tmTempAllocatorApi
+  api*: ptr tmTempAllocatorApi
+  o*: tmTempAllocator1024O
   p*: ptr tmTempAllocatorI
-  o: tmTempAllocator1024O
 
 proc `=destroy`*(a: var TempAllocator) =
   if a.p != nil:
-    a.api.destroy(a.p);
+    a.api.destroy(a.p)
 
-proc initTempAllocator*(a: ptr tmTempAllocatorApi): TempAllocator =
-  result.api = a
-  result.p = a.createInBuffer(cast[cstring](result.o.buffer[0].addr), sizeof(result.o.buffer).uint64, nil)
+template initTempAllocator*(a: ptr tmTempAllocatorApi): TempAllocator =
+  var ta = TempAllocator(api: a)
+  ta.p = a.createInBuffer(cast[ptr UncheckedArray[cchar]](ta.o.buffer[0].addr), sizeof(ta.o.buffer).uint64, nil)
+  ta
 
 #[
 // Declares and initializes a regular allocator interface `a` from the temp allocator interface

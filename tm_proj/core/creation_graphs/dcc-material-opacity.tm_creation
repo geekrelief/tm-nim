@@ -1,0 +1,111 @@
+__type: "tm_creation_graph"
+__uuid: "74f0d52d-d921-3216-e7dc-1166679fd896"
+__prototype_type: "tm_creation_graph"
+__prototype_uuid: "ac7a9eda-f140-837a-ae1d-6d1ade0472ae"
+graph: {
+	__uuid: "e58089cf-a86a-fafa-771c-2a0eed897710"
+	__prototype_type: "tm_graph"
+	__prototype_uuid: "e0657bbe-dac2-b0a9-3387-4a8490c89176"
+	nodes: [
+		{
+			__uuid: "08d5bfc4-eece-1eb1-9b4a-2e99a4168149"
+			type: "shader_deconstruct_float4"
+			position_x: 376.9623718261719
+			position_y: -536.504150390625
+		}
+	]
+	connections: [
+		{
+			__uuid: "eca97956-9e40-8f88-8b67-689f0303d7aa"
+			from_node: "eb836b5b-84e5-766e-eecb-00dca376ed10"
+			to_node: "08d5bfc4-eece-1eb1-9b4a-2e99a4168149"
+			from_connector_hash: "1609e8f8d8051ecb"
+			to_connector_hash: "e782557dca5659d0"
+		}
+		{
+			__uuid: "3d1aad31-2996-c4d6-be7c-c6d55fdeda51"
+			from_node: "08d5bfc4-eece-1eb1-9b4a-2e99a4168149"
+			to_node: "49cbc4af-8314-05fa-fabc-00884be0de7a"
+			from_connector_hash: "f2afab6f85f8e4dc"
+			to_connector_hash: "2bbe599c6c8fe881"
+		}
+	]
+	comments: [
+		{
+			__uuid: "9fa687ef-0843-9ada-bd11-f0dc5486ddb8"
+			text: "Instance of dcc-material with with Opacity hooked up to alpha of Base Color."
+			position_x: -1345.11767578125
+			position_y: -862.6607055664063
+			font_scale: 4
+			tint_color: {
+				__uuid: "946079fb-6c2f-2870-1f45-2a8857dff24a"
+				a: 0.1176470592617989
+			}
+			label_only: true
+		}
+		{
+			__uuid: "21c48672-623e-049f-1a68-4107e3250c87"
+			text: "Opacity"
+			position_x: 252.8207092285156
+			position_y: -591.334716796875
+			width: 242.4402160644531
+			height: 215.2103881835938
+			font_scale: 2
+			override_color: true
+			tint_color: {
+				__uuid: "0cc436f1-65a3-4462-5474-67bb8e466e5a"
+				r: 0.3515326976776123
+				g: 0.2422811985015869
+				b: 0.4125427007675171
+				a: 0.1176470592617989
+			}
+		}
+	]
+	comments__removed: [
+		"82a00f58-f8f4-5889-4e7c-07329c7a2808"
+	]
+	interface: {
+		__uuid: "7c9f6e19-bcf0-3a20-26a1-400faf8869c7"
+		__prototype_type: "tm_graph_interface"
+		__prototype_uuid: "0323c374-e610-d3a9-25b1-0216ead37043"
+		inputs__instantiated: [
+			{
+				__uuid: "bb05e39e-cba6-e670-d3f0-666a490fcdd6"
+				__prototype_type: "tm_graph_input"
+				__prototype_uuid: "ff51d976-5cce-4920-7f13-bb932c5e8e81"
+				value_set_by_user: true
+				value: {
+					__type: "lit_output_node_settings"
+					__uuid: "912c7255-083c-e03e-ae8b-b0a63b7789a7"
+					__prototype_type: "lit_output_node_settings"
+					__prototype_uuid: "5437f7cb-5faf-7910-27c6-7b7b3ded606f"
+					face_culling: "58b514dce6360537"
+				}
+			}
+		]
+		cached_node_result__instantiated: [
+			{
+				__uuid: "1680336f-8276-303b-b84f-3edb45831190"
+				__prototype_type: "tm_graph_cached_node_result"
+				__prototype_uuid: "e104c843-70a9-86c9-5e7f-a63212c7a8fa"
+				node: "49cbc4af-8314-05fa-fabc-00884be0de7a"
+				validity_hash: "928c62d5c5253ffc"
+				object: {
+					__type: "tm_shader_system_compiled_result"
+					__uuid: "c0ee0b51-57ae-f142-d3a7-11b273a6531a"
+					name: "928c62d5c5253ffc"
+					buffer: "bbd2f86c02c5f6cd"
+				}
+			}
+		]
+	}
+}
+__asset_uuid: "9213daaf-fd55-4217-2cbb-1ceb891a4910"
+__asset_labels: [
+	"672a73adabfebcc2"
+]
+__asset_thumbnail: {
+	__uuid: "3f7f4114-563a-1065-ed10-563f3986f09a"
+	thumbnail: "2f5291e48fdd7781"
+	validity_hash: "697fa6a4916773d5"
+}

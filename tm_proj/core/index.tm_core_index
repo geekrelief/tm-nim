@@ -1,0 +1,159 @@
+__type: "tm_core_index"
+__uuid: "bb16b14a-1ebd-2730-2267-5f642cc2cdbf"
+entries: [
+	{
+		__uuid: "b6183635-2dd8-e9f6-c8e3-a71b50254dcf"
+		core_id: "41d9d3513cb2df45"
+		object: "e47809e9-558e-a0cb-866b-2072a2e0888c"
+		object__type: "tm_creation_graph"
+		version: 3
+	}
+	{
+		__uuid: "6f586fcf-0054-e490-63f5-481eff7bdc1a"
+		core_id: "cb3b56233f97d3c9"
+		object: "ac7a9eda-f140-837a-ae1d-6d1ade0472ae"
+		object__type: "tm_creation_graph"
+		version: 9
+	}
+	{
+		__uuid: "98dfaf3b-d05a-feb9-a3d2-b60b9168651c"
+		core_id: "d6433cc102eae9fa"
+		object: "74f0d52d-d921-3216-e7dc-1166679fd896"
+		object__type: "tm_creation_graph"
+		version: 2
+	}
+	{
+		__uuid: "5717200b-4992-e2b8-d6fb-ec9439ecad43"
+		core_id: "2c4f32ba3e91c4d0"
+		object: "ae204997-eea9-53c1-17bd-2faca6857c73"
+		object__type: "tm_creation_graph"
+		version: 5
+	}
+	{
+		__uuid: "2802d6eb-9fde-43bd-56ab-8f3058dcdc26"
+		core_id: "a6efb4eb3b0ba551"
+		object: "273c799e-0804-313c-560f-77d617d41027"
+		object__type: "tm_creation_graph"
+		version: 2
+	}
+	{
+		__uuid: "c5f9a01f-f5d3-fadc-8c96-02d32cdf2b30"
+		core_id: "ce82370956e91b9b"
+		object: "d6b058a5-ea5c-e03b-eba9-8e49f409a09b"
+		object__type: "tm_creation_graph"
+		version: 2
+	}
+	{
+		__uuid: "201b9e1c-69fa-c770-c1a9-6071dbba13b5"
+		core_id: "750bf1d50a6871ed"
+		object: "9f829e31-b0cb-b5fe-21af-ab561d841602"
+		object__type: "tm_creation_graph"
+		version: 2
+	}
+	{
+		__uuid: "f9b226ff-7398-f51a-0aee-a30d8446c544"
+		core_id: "3ea210b24cb67ac0"
+		object: "37ddeda8-49a6-95e6-4506-7f2bb8c2a32f"
+		object__type: "tm_creation_graph"
+		version: 2
+	}
+	{
+		__uuid: "eb9a3f4d-7085-89f7-3e1e-b1801e9c6cb8"
+		core_id: "61ae80557fa40715"
+		object: "507a09d1-2817-15ef-11e1-76b4a3b7c229"
+		object__type: "tm_creation_graph"
+		version: 3
+	}
+	{
+		__uuid: "a0d98a83-acc1-1d45-2caa-09eb9c929f1d"
+		core_id: "c3cb40940269bf09"
+		object: "e8151be1-8d26-755f-b1c0-541eaf4fca61"
+		object__type: "tm_creation_graph"
+		version: 2
+	}
+	{
+		__uuid: "aaa61f6e-5dfe-071b-3def-1fcf03cab88b"
+		core_id: "8f55daabfe131cf5"
+		object: "1b68cc8b-5c58-203c-798c-b869070ea89b"
+		object__type: "tm_asset_label"
+		version: 1
+	}
+	{
+		__uuid: "fd34fcb9-9675-7d6f-f5b7-6cdc2f39199e"
+		core_id: "64a595fbb71697f3"
+		object: "05fe482f-df58-c56a-fa4b-ddf77c8dcfa0"
+		object__type: "tm_entity"
+		version: 3
+	}
+	{
+		__uuid: "277f90d4-f40a-60a5-9d4e-bfd803801a1e"
+		core_id: "a0bc8de9fe14a626"
+		object: "d1108c05-1ed8-1a44-93cd-defa729ff68e"
+		object__type: "tm_entity"
+		version: 5
+	}
+	{
+		__uuid: "8c872968-f215-3d26-a721-edfee5a6fe4a"
+		core_id: "6577b720f5a1d990"
+		object: "0c9824e6-8fb4-d84b-86a5-1715a66111dc"
+		object__type: "tm_entity"
+		version: 3
+	}
+	{
+		__uuid: "6ff4e5e7-5f08-74a5-8999-3242ab155909"
+		core_id: "1e5d4cdd7939e82d"
+		object: "18b3ae96-1abf-bdcf-6e18-a5b500638249"
+		object__type: "tm_entity"
+		version: 1
+	}
+	{
+		__uuid: "e6c2f774-d554-3a64-ebf6-ea8b36cbf764"
+		core_id: "638d428f19113539"
+		object: "a54f6f5c-b3ee-6ab8-4f2b-03f9bd53b0b8"
+		object__type: "tm_entity"
+		version: 4
+	}
+	{
+		__uuid: "1f3ffb83-a48a-b489-faee-5a87e10057e3"
+		core_id: "3af97e1e87bf588e"
+		object: "74d2928e-9a15-bdb0-9d75-3026ebdd552f"
+		object__type: "tm_entity"
+		version: 1
+	}
+	{
+		__uuid: "a6d380cd-7ee8-7719-d12b-3d4e271b0a2a"
+		core_id: "ee1027b7cc52b3b9"
+		object: "3ad88a64-2b81-508b-4e84-4160cc346b12"
+		object__type: "tm_entity"
+		version: 2
+	}
+	{
+		__uuid: "8e9e8b9d-7ebb-a0b8-d3d3-47bf280af490"
+		core_id: "5a8e508b4fd11f52"
+		object: "f4f2b683-db2c-cb10-b6e5-0772d019e54f"
+		object__type: "tm_entity"
+		version: 2
+	}
+	{
+		__uuid: "dbe287a5-fb48-a3cf-a045-ad830fa42270"
+		core_id: "6630f4ffb44d1b0f"
+		object: "9b32539f-83a5-ddb8-ec03-3a8a8deb47f6"
+		object__type: "tm_entity"
+		version: 2
+	}
+	{
+		__uuid: "26c39a92-36b4-9698-db92-70628d0c8554"
+		core_id: "8853233a72720242"
+		object: "cb5231fa-3d88-9a99-6224-e47bc8118aa5"
+		object__type: "tm_entity"
+		version: 2
+	}
+	{
+		__uuid: "739eb121-d833-569b-e28b-1bcd3f06f319"
+		core_id: "7dd92f9680f1c232"
+		object: "e1a96bce-8ec1-8345-707e-6b4c2a23cb03"
+		object__type: "tm_entity"
+		version: 5
+	}
+]
+__asset_uuid: "7e2240b6-31ef-fde4-f77b-d587b8d05d84"

@@ -67,10 +67,10 @@ converter to_tt_type*(id: tm_tt_id_t): tm_tt_type_t {.inline.} =
 proc TM_VERSION*(major, minor, patch: uint32): tm_version_t {.inline.} =
   tm_version_t(major: major, minor: minor, patch: patch)
 
-macro TM_STATIC_HASH*(x: string, h: uint64 = 0): tm_strhash_t =
+macro TM_STATIC_HASH*(x: static string, h: uint64 = 0): tm_strhash_t =
   var hashLit = 
     if h.intVal == 0: 
-      newLit(murmurHash64A(x.strVal)) 
+      newLit(murmurHash64A(x)) 
     else: 
       h
   result = newTree(nnkCast, ident("tm_strhash_t"), hashLit)

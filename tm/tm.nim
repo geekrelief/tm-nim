@@ -52,10 +52,10 @@ func toArray*[T](n: static int, a: varargs[T]): array[n, T] =
 include foundation / api_types
 include tm_generated
 include foundation / [
+  log,
   api_registry, 
   allocator, 
   temp_allocator,
-  log,
   localizer,
   the_truth,
   carray
