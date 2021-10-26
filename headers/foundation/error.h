@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOUNDATION_ERROR
+#define FOUNDATION_ERROR
 
 #include "api_types.h"
 
@@ -132,3 +133,6 @@ extern struct tm_error_api *tm_error_api;
 // }
 // ~~~~
 #define TM_NOT_YET_IMPLEMENTED(ei) TM_ERROR(ei, "%s() not yet implemented", __func__)
+
+
+#endif

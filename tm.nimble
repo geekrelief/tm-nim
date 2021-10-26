@@ -39,7 +39,7 @@ task gen, "(dev) Generate the binding":
     exec &"nim c tm_gen.nim"
 
 proc commonFlags(): seq[string] =
-  let cc = "vcc" # tcc doesn't like pragma once, getting undefined errors with gcc linker again
+  let cc = "tcc" # tcc doesn't like pragma once, getting undefined errors with gcc linker again
   var flags = @[&"--cc:{cc}"]
 
   flags.add case cc:
@@ -48,7 +48,8 @@ proc commonFlags(): seq[string] =
       # 4133: incompatible types for proc callback, 4028: parameter different from declaration ({.header, importc.} warnings)
       "--passC:\"/wd4311 /wd4312 /wd4103 /wd4133 /wd4028\" " & 
       "--threads:on --tlsEmulation:off "
-    #[of "gcc": "--threads:on --tlsEmulation:off" ]#
+    of "tcc":
+      "--threads:off --tlsEmulation:on "
     else: 
       raise newException(Defect, cc & " is not supported.")
 

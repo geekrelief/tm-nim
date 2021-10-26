@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOUNDATION_LOCALIZER
+#define FOUNDATION_LOCALIZER
 
 #include "api_types.h"
 
@@ -217,4 +218,7 @@ struct tm_localizer_api
 
 #if defined(TM_LINKS_FOUNDATION)
 extern struct tm_localizer_api *tm_localizer_api;
+#endif
+
+
 #endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SIMULATION_SIMULATION_ENTRY
+#define SIMULATION_SIMULATION_ENTRY
 
 #include <foundation/api_types.h>
 
@@ -166,3 +167,6 @@ enum {
     TM_TT_PROP__SIMULATION_ENTRY_COMPONENT__IDS, // subobject_set (uint64_t)
     TM_TT_PROP__SIMULATION_ENTRY_COMPONENT__SETTINGS, // subobject_set (TM_TT_TYPE__SIMULATION_ENTRY_SETTINGS)
 };
+
+
+#endif

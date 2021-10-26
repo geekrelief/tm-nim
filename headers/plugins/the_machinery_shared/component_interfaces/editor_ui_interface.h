@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COMPONENT_INTERFACES_EDITOR_UI_INTERFACE
+#define COMPONENT_INTERFACES_EDITOR_UI_INTERFACE
 
 #include <foundation/api_types.h>
 
@@ -145,3 +146,6 @@ typedef struct tm_ci_editor_ui_i
     // Optional. Custom toolbar to be used when this component is selected.
     struct tm_toolbar_i *(*toolbars)(struct tm_ci_toolbar *ci, struct tm_temp_allocator_i *ta);
 } tm_ci_editor_ui_i;
+
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOUNDATION_LOG
+#define FOUNDATION_LOG
 
 #include "api_types.h"
 
@@ -98,4 +99,7 @@ struct tm_logger_api
 
 #if defined(TM_LINKS_FOUNDATION)
 extern struct tm_logger_api *tm_logger_api;
+#endif
+
+
 #endif

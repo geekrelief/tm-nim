@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOUNDATION_THE_TRUTH
+#define FOUNDATION_THE_TRUTH
 
 #include "api_types.h"
 
@@ -1750,4 +1751,7 @@ struct tm_the_truth_api
 
 #if defined(TM_LINKS_FOUNDATION)
 extern struct tm_the_truth_api *tm_the_truth_api;
+#endif
+
+
 #endif

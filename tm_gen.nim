@@ -32,6 +32,7 @@ cExclude(tm_headers_dir & "foundation/api_types.h")
 cIncludeDir(tm_headers_dir)
 cDefine("TM_LINKS_FOUNDATION")
 cDefine("_MSC_VER") # only works with vcc, other compilers not supported
+cDefine("TCC")
 cDefine("TM_OS_WINDOWS")
 
 cImport( flags = "-c -E_ -F_ -G__=_", recurse = true,

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOUNDATION_MATH
+#define FOUNDATION_MATH
 
 TM_DISABLE_PADDING_WARNINGS
 
@@ -1763,3 +1764,6 @@ static inline bool tm_equal_abs_eps(float a, float b, float eps)
 {
     return fabsf(a - b) < eps;
 }
+
+
+#endif

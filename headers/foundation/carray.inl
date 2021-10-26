@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOUNDATION_CARRAY
+#define FOUNDATION_CARRAY
 
 #include "allocator.h"
 #include "api_types.h"
@@ -247,3 +248,6 @@ static inline void *tm_carray_temp_grow_internal(void *arr, uint64_t to_at_least
     const uint64_t new_capacity = tm_max(min_new_capacity, to_at_least);
     return tm_carray_temp_set_capacity_internal(arr, new_capacity, item_size, ta);
 }
+
+
+#endif

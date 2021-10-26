@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENTITY_ENTITY_API_TYPES
+#define ENTITY_ENTITY_API_TYPES
 
 #include <foundation/api_types.h>
 
@@ -31,3 +32,5 @@ typedef struct tm_component_type_t
 #define TM_NO_COMPONENT_TYPE ((tm_component_type_t){ 0 })
 
 struct tm_set_entity_t;
+
+#endif

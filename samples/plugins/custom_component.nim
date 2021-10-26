@@ -2,7 +2,7 @@ import tm
 import std / [math]
 import strformat
 
-const version = TmVersion(0, 1, 0)
+const version = TmVersion(0, 2, 0)
 
 var 
   entity: ptr tmEntityApi
@@ -115,6 +115,6 @@ proc tmLoadPlugin(reg: ptr tm_api_registry_api, load: bool) {.callback.} =
   reg.tmGetApiFor entity, transformComponent, tempAllocator, truth, localizer, log
 
   if load:
-    log.info(&"Hi from custom component! {version}")
+    log.info(&"hell yeah {version}")
 
   reg.tmAddOrRemoveImpl load, truthCreateTypes, componentCreate, componentRegisterEngine

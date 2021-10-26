@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENTITY_TRANSFORM_COMPONENT
+#define ENTITY_TRANSFORM_COMPONENT
 
 #include "entity_api_types.h"
 
@@ -275,4 +276,7 @@ struct tm_transform_component_api
 
 #if defined(TM_LINKS_ENTITY)
 extern struct tm_transform_component_api *tm_transform_component_api;
+#endif
+
+
 #endif

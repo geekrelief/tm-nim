@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENTITY_ENTITY
+#define ENTITY_ENTITY
 
 #include "entity_api_types.h"
 
@@ -1200,4 +1201,7 @@ static inline void tm_entity_mask_remove_component(tm_component_mask_t *mask, tm
 #if defined(TM_LINKS_ENTITY)
 extern struct tm_entity_api *tm_entity_api;
 extern struct tm_entity_commands_api *tm_entity_commands_api;
+#endif
+
+
 #endif

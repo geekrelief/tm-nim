@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOUNDATION_HASH
+#define FOUNDATION_HASH
 
 #include "allocator.h"
 #include "error.h"
@@ -682,3 +683,5 @@ static inline uint32_t tm_hash__num_real_keys(const uint64_t *keys, uint32_t num
         num_keys += (keys[i] < TM_HASH_TOMBSTONE);
     return num_keys;
 }
+
+#endif

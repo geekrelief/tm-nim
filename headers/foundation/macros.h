@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOUNDATION_MACROS
+#define FOUNDATION_MACROS
 
 // Defines some commonly used macros.
 
@@ -69,4 +70,7 @@
 #define TM_DIRSEP "\\"
 #else
 #define TM_DIRSEP "/"
+#endif
+
+
 #endif
