@@ -82,6 +82,7 @@ proc engineUpdateCustom(inst: ptr tmEngineO, data: ptr tmEngineUpdateSetT, comma
         custom[i.int].y0 = transform[i.int].world.pos.y
       let y = custom[i.int].y0 + custom[i.int].amplitude * sin(float(t) * custom[i.int].frequency)
       transform[i.int].world.pos.y = y
+      transform[i.int].world.rot = tmQuaternionFromEuler(vec3(0.0, t * custom[i.int].frequency, 0.0))
       inc transform[i.int].version
       discard tmCarrayTempPush(modTransform, a[j].entities[i.int], ta)
   

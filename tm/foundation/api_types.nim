@@ -18,7 +18,9 @@ type
     xx*, xy*, xz*, xw*, yx*, yy*, yz*, yw*, zx*, zy*, zz*, zw*, wx*, wy*, wz*, ww*: cfloat
 
   tm_transform_t* {.struct, impapi_typesHdr, importc: "struct tm_transform_t".} = object
-    pos*, rot*, scl*: tm_vec3_t
+    pos*: tm_vec3_t 
+    rot*: tm_vec4_t
+    scl*: tm_vec3_t
 
   tm_rect_t* {.struct, impapi_typesHdr, importc: "struct tm_rect_t".} = object
     x*, y*, w*, h*: cfloat
