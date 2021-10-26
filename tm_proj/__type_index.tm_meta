@@ -29,7 +29,7 @@
 			}
 		]
 		default: {
-			frequency: 1
+			frequency: 2
 			amplitude: 1
 		}
 	}

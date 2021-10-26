@@ -39,7 +39,7 @@ proc truthCreateTypes(tt: ptr tmTheTruthO) {.cdecl, tmType: tmTheTruthCreateType
   let 
     customComponentType = truth.createObjectType(tt, TtTypeCustomComponent, customComponentProperties[0].unsafeAddr, customComponentProperties.len.uint32)
     defaultObject = truth.quickCreateObject(tt, TmTtNoUndoScope, TtTypeHashCustomComponent,
-      Frequency, 1.0, Amplitude, 1.0, -1)
+      Frequency, 2.0, Amplitude, 1.0, -1)
   truth.set_default_object(tt, customComponentType, defaultObject)
   truth.set_aspect(tt, customComponentType, TmCiEditorUi, editor_aspect.unsafeAddr)
 
@@ -115,6 +115,6 @@ proc tmLoadPlugin(reg: ptr tm_api_registry_api, load: bool) {.callback.} =
   reg.tmGetApiFor entity, transformComponent, tempAllocator, truth, localizer, log
 
   if load:
-    log.info("Hi from custom component!")
+    log.info(&"Hi from custom component! {version}")
 
   reg.tmAddOrRemoveImpl load, truthCreateTypes, componentCreate, componentRegisterEngine

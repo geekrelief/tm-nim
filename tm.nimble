@@ -59,14 +59,15 @@ proc commonFlags(): seq[string] =
 proc buildProject(name, targetDir: string = ""): void =
   let nimFilePath = samples_dir & name & ".nim"
   let dll = &"tm_{name}.dll"
-  let settings = commonFlags() & &"-o:{dll} --outdir:\"{build_dir}\""
-  mkdir(build_dir & name)
+  var outdir = build_dir & name & "/"
+  mkdir(outdir)
+  let settings = commonFlags() & &"-o:{dll} --outdir:\"{outdir}\""
   exec &"nim c {settings.join(\" \")} {nimFilePath}"
   var targetDir = if targetDir.len == 0: tm_plugins_dir else: targetDir
   targetDir.normalizePathEnd(true)
   mkdir(targetDir)
-  if build_dir != targetDir:
-    cpFile(build_dir & dll, targetDir & dll)
+  if outdir != targetDir:
+    cpFile(outdir & dll, targetDir & dll)
 
 task new, "Creates scaffolding for new plugin":
   var params = taskParams()

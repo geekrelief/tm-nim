@@ -144,6 +144,10 @@ children: [
 							__uuid: "d3cc9c98-156b-ec15-c7d7-c779c22b109f"
 							__prototype_type: "tm_rotation"
 							__prototype_uuid: "c1135018-faa8-fef1-ccc4-f8f42428f723"
+							x: -0.54974365234375
+							y: -0.1230106949806213
+							z: -0.008766278624534607
+							w: 0.8261800408363342
 						}
 						local_scale: {
 							__uuid: "f4b01699-5ba4-a13c-e10d-95106cd17a2a"
@@ -162,7 +166,7 @@ children: [
 		components: [
 			{
 				__type: "custom_component"
-				__uuid: "db43c609-f976-0dce-6161-a03490148da8"
+				__uuid: "74456c1b-bc8c-0642-3d85-1331b02d83dd"
 			}
 		]
 		components__instantiated: [
