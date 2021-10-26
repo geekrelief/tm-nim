@@ -12,6 +12,7 @@ requires "nim >= 1.6.0"
 requires "ptr_math >= 0.3.0"
 
 const dev = false
+const cc = "vcc" # tcc doesn't like pragma once, getting undefined errors with gcc linker again
 
 when not defined(dev):
   requires "https://github.com/geekrelief/nimterop >= 0.8.2"
@@ -34,12 +35,11 @@ proc taskParams(): seq[string] = # nimble's paramCount / paramStr is broken in v
 
 task gen, "(dev) Generate the binding":
   if dev:
-    exec &"nim c -d:dev tm_gen.nim"
+    exec &"nim c --cc:{cc} -d:dev tm_gen.nim"
   else:
-    exec &"nim c tm_gen.nim"
+    exec &"nim c --cc:{cc} tm_gen.nim"
 
 proc commonFlags(): seq[string] =
-  let cc = "tcc" # tcc doesn't like pragma once, getting undefined errors with gcc linker again
   var flags = @[&"--cc:{cc}"]
 
   flags.add case cc:

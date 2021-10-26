@@ -82,7 +82,10 @@ proc engineUpdateCustom(inst: ptr tmEngineO, data: ptr tmEngineUpdateSetT, comma
         custom[i.int].y0 = transform[i.int].world.pos.y
       let y = custom[i.int].y0 + custom[i.int].amplitude * sin(float(t) * custom[i.int].frequency)
       transform[i.int].world.pos.y = y
-      transform[i.int].world.rot = tmQuaternionFromEuler(vec3(0.0, t * custom[i.int].frequency, 0.0))
+      transform[i.int].world.pos.x = sin(float(t) * 4523.2f)*0.0323f
+      transform[i.int].world.pos.z = cos(float(t) * 3523.2f)*0.0463f
+      let angle = t * custom[i.int].frequency
+      transform[i.int].world.rot = tmQuaternionFromEuler(vec3(x = angle * 0.981, y = angle * 1.23, z = angle))
       inc transform[i.int].version
       discard tmCarrayTempPush(modTransform, a[j].entities[i.int], ta)
   
@@ -116,6 +119,6 @@ proc tmLoadPlugin(reg: ptr tm_api_registry_api, load: bool) {.callback.} =
   reg.tmGetApiFor entity, transformComponent, tempAllocator, truth, localizer, log
 
   if load:
-    log.info(&"hell yeah {version}")
+    log.info(&"custom component {version}")
 
   reg.tmAddOrRemoveImpl load, truthCreateTypes, componentCreate, componentRegisterEngine

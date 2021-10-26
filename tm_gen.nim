@@ -31,9 +31,11 @@ cExclude(tm_headers_dir & "foundation/localizer.h")
 cExclude(tm_headers_dir & "foundation/api_types.h")
 cIncludeDir(tm_headers_dir)
 cDefine("TM_LINKS_FOUNDATION")
-cDefine("_MSC_VER") # only works with vcc, other compilers not supported
-cDefine("TCC")
 cDefine("TM_OS_WINDOWS")
+when defined(vcc) or defined(tcc):
+  cDefine("_MSC_VER")
+when defined(tcc):
+  cDefine("TCC")
 
 cImport( flags = "-c -E_ -F_ -G__=_", recurse = true,
   nimFile = "tm/tm_generated.nim", 

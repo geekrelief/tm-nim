@@ -80,13 +80,13 @@ macro TM_STATIC_HASH*(x: static string, h: uint64 = 0): tm_strhash_t =
 const TM_PAGE_SIZE* = 4096
 
 #== helpers ==
-proc vec2*(x, y: float): tm_vec2_t {.inline.} =
+proc vec2*(x, y: float = 0.0): tm_vec2_t {.inline.} =
   tm_vec2_t(x: x, y: y)
 
-proc vec3*(x, y, z: float): tm_vec3_t {.inline.} =
+proc vec3*(x, y, z: float = 0.0): tm_vec3_t {.inline.} =
   tm_vec3_t(x: x, y: y, z: z)
 
-proc vec4*(x, y, z, w: float): tm_vec4_t {.inline.} =
+proc vec4*(x, y, z, w: float = 0.0): tm_vec4_t {.inline.} =
   tm_vec4_t(x: x, y: y, z: z, w: w)
 
 proc mat44*(xx, xy, xz, xw,
