@@ -1,6 +1,6 @@
 # tm-nim is a WIP binding generator for The Machinery. #
 
-Tested: With vcc and tcc on Windows.
+Tested: With vcc and tcc on Windows, and The Machinery master branch.
 ## Generate the binding ##
 - Configure `tm.nimble` with the necessary paths, values:, i.e. for The Machinery, compiler
 - In this repo a `headers` directory is included for wrapping a subset of the headers.
@@ -13,6 +13,14 @@ Tested: With vcc and tcc on Windows.
 
 ## Building your plugin ##
 - Add a new task to `tm.nimble` to build your plugin. See the examples at the bottom of the file.
+
+## Using TinyCC / tcc ##
+- Prereqs
+  - Copy `tcc\intrin.h` to your tcc include folder for win32. It's used by `math.inl`.
+  - `nim r remove_pragma_once.nim` script modifies the headers to work with tcc.  tcc doesn't support the non-standard `#pragma once`. 
+  - `foundation/api_types.h` is modified to check for `TCC` so it defines `TM_DISABLE_PADDING_WARNINGS` and `TM_RESTORE_PADDING_WARNINGS` with nothing. They're used in `math.inl`.
+- Modify tm.nimble to set the compiler to `tcc`
+- Run `nimble gen` again to regenerate `tm/tm_generated.nim`, then build your plugin
 
 ## Adding new headers to the binding ##
 - The generator doesn't wrap all of The Machinery.
@@ -27,9 +35,5 @@ Tested: With vcc and tcc on Windows.
 ## Proc Type issues ##
 The Machinery uses lots of function pointers and callbacks. There's a custom pragma `tmType` you can attach to a proc to make it easier to interact with the api. Without it you need to cast the proc.
 
-## Using TinyCC / tcc ##
-- Prereqs
-  - Copy `tcc\intrin.h` to your tcc include folder for win32. It's used by `math.inl`.
-  - `nim r remove_pragma_once.nim` script modifies the headers to work with tcc.  tcc doesn't support the non-standard `#pragma once`. 
-  - `foundation/api_types.h` is modified to check for `TCC` so it defines `TM_DISABLE_PADDING_WARNINGS` and `TM_RESTORE_PADDING_WARNINGS` with nothing. They're used in `math.inl`.
-- Modify tm.nimble to set the compiler to `tcc`
+## Pointers and arrays ##
+Since TM is written in C we're going to have to manipulate lots of `UncheckedArray`s and `ptr`/`pointer`s. The `ptr_math` package is included to make things easier to work with.
