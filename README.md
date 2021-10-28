@@ -36,4 +36,4 @@ Tested: With vcc and tcc on Windows, and The Machinery master branch.
 The Machinery uses lots of function pointers and callbacks. There's a custom pragma `tmType` you can attach to a proc to make it easier to interact with the api. Without it you need to cast the proc.
 
 ## Pointers and arrays ##
-Since TM is written in C we're going to have to manipulate lots of `UncheckedArray`s and `ptr`/`pointer`s. The `ptr_math` package is included to make things easier to work with.
+Since TM is written in C we're going to have to manipulate lots of `UncheckedArray`s and `ptr`/`pointer`s. The `ptr_math` package is included to make things easier to work with. I've also added iterators for `m/items`, `m/pairs` that work with `UncheckedArray` and `ptr T`.
