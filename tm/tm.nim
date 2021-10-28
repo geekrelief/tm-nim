@@ -49,6 +49,35 @@ func toArray*[T](n: static int, a: varargs[T]): array[n, T] =
   for i, x in a:
     result[i] = x
 
+iterator items*[T](starting: ptr T, ending: ptr T): lent T =
+  var p = starting
+  while p != ending:
+    yield p[] 
+    p += 1
+
+iterator mitems*[T](starting: ptr T, ending: ptr T): var T =
+  var p = starting
+  while p != ending:
+    yield p[] 
+    p += 1
+
+iterator items*[T](uarray: UncheckedArray[T] | ptr T, len: SomeInteger): lent T =
+  for i in 0..<len:
+    yield uarray[i]
+
+iterator mitems*[T](uarray: UncheckedArray[T] | ptr T, len: SomeInteger): var T =
+  for i in 0..<len:
+    yield uarray[i]
+
+iterator pairs*[T](uarray: UncheckedArray[T] | ptr T, len: SomeInteger): (SomeInteger, lent T) =
+  for i in 0..<len:
+    yield (i, uarray[i])
+
+iterator mpairs*[T](uarray: UncheckedArray[T] | ptr T, len: SomeInteger): (SomeInteger, var T) =
+  for i in 0..<len:
+    yield (i, uarray[i])
+
+
 include foundation / api_types
 include tm_generated
 include foundation / [

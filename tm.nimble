@@ -9,10 +9,14 @@ bin = @["tm_gen"]
 # Dependencies
 
 requires "nim >= 1.6.0"
-requires "ptr_math >= 0.3.0"
+requires "https://github.com/geekrelief/ptr_math >= 0.4.0"
 
 const dev = false
-const cc = "vcc" # tcc doesn't like pragma once, getting undefined errors with gcc linker again
+const cc = "tcc" # vcc or tcc work, but tcc needs to modify headers, gcc linker is having issues
+
+const samples_dir = "samples/plugins/"
+const build_dir = "C:/tm/tm-nim/build/samples/plugins/"
+const tm_plugins_dir = "C:/tm/gr-tm/bin/Debug/plugins/"
 
 when not defined(dev):
   requires "https://github.com/geekrelief/nimterop >= 0.8.2"
@@ -21,9 +25,6 @@ import globals
 import strformat, strutils
 import os
 
-const samples_dir = "samples/plugins/"
-const build_dir = "C:/tm/tm-nim/build/samples/plugins/"
-const tm_plugins_dir = "C:/tm/gr-tm/bin/Debug/plugins/"
 
 proc taskParams(): seq[string] = # nimble's paramCount / paramStr is broken in v0.13.1
   var params = commandLineParams()
@@ -41,6 +42,8 @@ task gen, "(dev) Generate the binding":
 
 proc commonFlags(): seq[string] =
   var flags = @[&"--cc:{cc}"]
+  if dev:
+    flags.add "--path:\"../gr-ptr_math/src\""
 
   flags.add case cc:
     of "vcc":

@@ -327,6 +327,122 @@
 		}
 	}
 	{
+		name: "tm_animation_curve"
+		properties: [
+			{
+				name: "keys"
+				type: "subobject_set"
+				type_hash: "8a21801392ab2f09"
+			}
+		]
+	}
+	{
+		name: "tm_animation_curve_key"
+		properties: [
+			{
+				name: "time"
+				type: "float"
+			}
+			{
+				name: "value"
+				type: "float"
+			}
+		]
+	}
+	{
+		name: "tm_animation_curve_set"
+		properties: [
+			{
+				name: "entities"
+				type: "subobject_set"
+				type_hash: "acc2d052e0d904fd"
+			}
+		]
+		default: {
+			entities: [
+				{
+					name: "default"
+					curves: [
+						{
+							name: "world.local.pos"
+							type: 2
+							x: {
+								keys: [
+									{
+										value: 1
+									}
+								]
+							}
+							y: {
+							}
+							z: {
+							}
+							w: {
+							}
+						}
+					]
+				}
+			]
+		}
+	}
+	{
+		name: "tm_animation_entity_curves"
+		properties: [
+			{
+				name: "name"
+				type: "string"
+			}
+			{
+				name: "curves"
+				type: "subobject_set"
+				type_hash: "c307feb6d5690fa0"
+			}
+		]
+	}
+	{
+		name: "tm_animation_property_curves"
+		properties: [
+			{
+				name: "name"
+				type: "string"
+			}
+			{
+				name: "type"
+				type: "uint32_t"
+			}
+			{
+				name: "x"
+				type: "subobject"
+				type_hash: "aed8751afe4e2988"
+			}
+			{
+				name: "y"
+				type: "subobject"
+				type_hash: "aed8751afe4e2988"
+			}
+			{
+				name: "z"
+				type: "subobject"
+				type_hash: "aed8751afe4e2988"
+			}
+			{
+				name: "w"
+				type: "subobject"
+				type_hash: "aed8751afe4e2988"
+			}
+		]
+		default: {
+			x: {
+			}
+			y: {
+			}
+			z: {
+			}
+			w: {
+			}
+		}
+	}
+	{
 		name: "tm_animation_simple_player_component"
 		properties: [
 			{
@@ -2606,11 +2722,6 @@
 				type_hash: "6afaa9f50456cb1b"
 			}
 			{
-				name: "entity"
-				type: "reference"
-				type_hash: "ca71127abbb72960"
-			}
-			{
 				name: "source_import_settings"
 				type: "subobject"
 				type_hash: "547ea358e1329c8c"
@@ -2822,6 +2933,34 @@
 				name: "saturation"
 				type: "float"
 			}
+			{
+				name: "tonemapper"
+				type: "uint32_t"
+			}
+			{
+				name: "toe strength"
+				type: "float"
+			}
+			{
+				name: "toe length"
+				type: "float"
+			}
+			{
+				name: "shoulder strength"
+				type: "float"
+			}
+			{
+				name: "shoulder length"
+				type: "float"
+			}
+			{
+				name: "shoulder angle"
+				type: "float"
+			}
+			{
+				name: "gamma"
+				type: "float"
+			}
 		]
 		default: {
 			enabled: true
@@ -2835,6 +2974,13 @@
 			slope: {
 			}
 			saturation: 1
+			tonemapper: 1
+			"toe strength": 0.5
+			"toe length": 0.5
+			"shoulder strength": 2
+			"shoulder length": 0.5
+			"shoulder angle": 1
+			gamma: 1
 		}
 	}
 	{
@@ -3398,6 +3544,15 @@
 		]
 	}
 	{
+		name: "tm_global_graph_settings"
+		properties: [
+			{
+				name: "enable_snapping"
+				type: "bool"
+			}
+		]
+	}
+	{
 		name: "tm_gpu_image_create_settings"
 		properties: [
 			{
@@ -3520,10 +3675,15 @@
 				type: "subobject"
 				type_hash: "d8d2adf4ea2129be"
 			}
+			{
+				name: "grid_size"
+				type: "float"
+			}
 		]
 		default: {
 			interface: {
 			}
+			grid_size: 30
 		}
 	}
 	{
@@ -3850,14 +4010,6 @@
 				type: "float"
 			}
 			{
-				name: "grid_snapping"
-				type: "bool"
-			}
-			{
-				name: "grid_size"
-				type: "float"
-			}
-			{
 				name: "debug_watch_wire_overlay_mode"
 				type: "uint32_t"
 			}
@@ -3877,7 +4029,6 @@
 			}
 		]
 		default: {
-			grid_size: 30
 			debug_watch_wire_overlay_mode: 5
 			show_removed_inherited: true
 		}
@@ -4316,27 +4467,28 @@
 				type_hash: "73e8309bad5667f0"
 			}
 			{
-				name: "dont send gamestate changes to"
+				name: "object validators"
 				type: "subobject_set"
-				type_hash: "dc2b19c4af5e7e5c"
+				type_hash: "bc67fe618d07fdfa"
 			}
 			{
-				name: "dont send graph changes to"
+				name: "struct validators"
 				type: "subobject_set"
-				type_hash: "58e819b2446aae91"
+				type_hash: "523bbbc53da16e36"
 			}
 			{
-				name: "graph events to transmit sorted"
+				name: "member validators"
 				type: "subobject_set"
-				type_hash: "fccd76a481ef88b0"
+				type_hash: "c7b42f994600fe8d"
 			}
 			{
-				name: "has ownership on all entities"
+				name: "passive gamestate"
 				type: "bool"
 			}
 			{
-				name: "send keyboard input to connected nodes"
-				type: "bool"
+				name: "forced automatic replication"
+				type: "subobject_set"
+				type_hash: "68fc0bd2ff878a68"
 			}
 		]
 	}
@@ -4386,6 +4538,19 @@
 		]
 	}
 	{
+		name: "tm_network_node_forced_component_automatic_replication"
+		properties: [
+			{
+				name: "name"
+				type: "string"
+			}
+			{
+				name: "timer"
+				type: "float"
+			}
+		]
+	}
+	{
 		name: "tm_network_node_graph_event_to_transmit"
 		properties: [
 			{
@@ -4423,10 +4588,6 @@
 				type: "bool"
 			}
 			{
-				name: "empty world"
-				type: "bool"
-			}
-			{
 				name: "download bandwidth"
 				type: "uint32_t"
 			}
@@ -4445,7 +4606,25 @@
 		]
 	}
 	{
+		name: "tm_network_node_member_validator"
+		properties: [
+			{
+				name: "name"
+				type: "string"
+			}
+		]
+	}
+	{
 		name: "tm_network_node_not_responding_handler"
+		properties: [
+			{
+				name: "name"
+				type: "string"
+			}
+		]
+	}
+	{
+		name: "tm_network_node_object_validator"
 		properties: [
 			{
 				name: "name"
@@ -4482,6 +4661,15 @@
 	}
 	{
 		name: "tm_network_node_send_update_to"
+		properties: [
+			{
+				name: "name"
+				type: "string"
+			}
+		]
+	}
+	{
+		name: "tm_network_node_struct_validator"
 		properties: [
 			{
 				name: "name"
@@ -6914,8 +7102,8 @@
 				type_hash: "5ea1bb7b6537de46"
 			}
 			{
-				name: "keep_aspect_ratio"
-				type: "bool"
+				name: "aspect_ratio_mode"
+				type: "uint32_t"
 			}
 			{
 				name: "virtual_rect"

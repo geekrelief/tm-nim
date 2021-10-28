@@ -75,17 +75,17 @@ proc engineUpdateCustom(inst: ptr tmEngineO, data: ptr tmEngineUpdateSetT, comma
     var
       custom = cast[ptr CustomComponentT](a.components[0])
       transform = cast[ptr tmTransformComponentT](a.components[1])
-    for i in 0..<a.n:
-      if custom[i.int].y0 == 0.0:
-        custom[i.int].y0 = transform[i.int].world.pos.y
-      let y = custom[i.int].y0 + custom[i.int].amplitude * sin(float(t) * custom[i.int].frequency)
-      transform[i.int].world.pos.y = y
-      #transform[i.int].world.pos.x = sin(float(t) * 4523.2f)*0.0323f
-      #transform[i.int].world.pos.z = cos(float(t) * 3523.2f)*0.0463f
-      let angle = t * custom[i.int].frequency
-      transform[i.int].world.rot = tmQuaternionFromEuler(vec3(x = angle * 0.981, y = angle * 1.23, z = angle))
-      inc transform[i.int].version
-      discard tmCarrayTempPush(modTransform, a.entities[i.int], ta)
+    for i, c in mpairs(custom, a.n):
+      if c.y0 == 0.0:
+        c.y0 = transform[i].world.pos.y
+      let y = c.y0 + c.amplitude * sin(float(t) * c.frequency)
+      transform[i].world.pos.y = y
+      #transform[i].world.pos.x = sin(float(t) * 4523.2f)*0.0323f
+      #transform[i].world.pos.z = cos(float(t) * 3523.2f)*0.0463f
+      let angle = t * c.frequency
+      transform[i].world.rot = tmQuaternionFromEuler(vec3(x = angle * 0.981, y = angle * 1.23, z = angle))
+      inc transform[i].version
+      discard tmCarrayTempPush(modTransform, a.entities[i], ta)
   
   entity.notify(ctx, data.engine.components[1], modTransform, tmCarraySize(modTransform).uint32)
 
