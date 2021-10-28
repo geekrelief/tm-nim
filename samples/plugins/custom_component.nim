@@ -66,28 +66,26 @@ proc engineUpdateCustom(inst: ptr tmEngineO, data: ptr tmEngineUpdateSetT, comma
     modTransform: ptr tmEntityT
     ctx = cast[ptr tmEntityContextO](inst)
     t = 0'f64
+ 
+  for bb in items(data.blackboardStart, data.blackboardEnd):
+    if bb.id == TmEntityBbTime: 
+      t = bb.doubleValue
 
-  var bb: ptr tmEntityBlackboardValueT = data.blackboardStart
-  while bb != data.blackboardEnd:
-    if bb.id == TmEntityBbTime: t = bb.doubleValue
-    bb += 1
-
-  var a: ptr UncheckedArray[tmEngineUpdateArrayT] = data.arrays.addr
-  for j in 0..<data.numArrays:
+  for a in items(data.arrays, data.numArrays):
     var
-      custom = cast[ptr CustomComponentT](a[j].components[0])
-      transform = cast[ptr tmTransformComponentT](a[j].components[1])
-    for i in 0..<a[j].n:
+      custom = cast[ptr CustomComponentT](a.components[0])
+      transform = cast[ptr tmTransformComponentT](a.components[1])
+    for i in 0..<a.n:
       if custom[i.int].y0 == 0.0:
         custom[i.int].y0 = transform[i.int].world.pos.y
       let y = custom[i.int].y0 + custom[i.int].amplitude * sin(float(t) * custom[i.int].frequency)
       transform[i.int].world.pos.y = y
-      transform[i.int].world.pos.x = sin(float(t) * 4523.2f)*0.0323f
-      transform[i.int].world.pos.z = cos(float(t) * 3523.2f)*0.0463f
+      #transform[i.int].world.pos.x = sin(float(t) * 4523.2f)*0.0323f
+      #transform[i.int].world.pos.z = cos(float(t) * 3523.2f)*0.0463f
       let angle = t * custom[i.int].frequency
       transform[i.int].world.rot = tmQuaternionFromEuler(vec3(x = angle * 0.981, y = angle * 1.23, z = angle))
       inc transform[i.int].version
-      discard tmCarrayTempPush(modTransform, a[j].entities[i.int], ta)
+      discard tmCarrayTempPush(modTransform, a.entities[i.int], ta)
   
   entity.notify(ctx, data.engine.components[1], modTransform, tmCarraySize(modTransform).uint32)
 
