@@ -75,17 +75,17 @@ proc engineUpdateCustom(inst: ptr tmEngineO, data: ptr tmEngineUpdateSetT, comma
     var
       custom = cast[ptr CustomComponentT](a.components[0])
       transform = cast[ptr tmTransformComponentT](a.components[1])
-    for i, c in mpairs(custom, a.n):
+    for i, c, tr, e in mrows(custom, transform, a.entities, a.n):
       if c.y0 == 0.0:
-        c.y0 = transform[i].world.pos.y
+        c.y0 = tr.world.pos.y
       let y = c.y0 + c.amplitude * sin(float(t) * c.frequency)
-      transform[i].world.pos.y = y
-      #transform[i].world.pos.x = sin(float(t) * 4523.2f)*0.0323f
-      #transform[i].world.pos.z = cos(float(t) * 3523.2f)*0.0463f
+      tr.world.pos.y = y
+      tr.world.pos.x = sin(float(t) * 4523.2f)*0.0323f
+      tr.world.pos.z = cos(float(t) * 3523.2f)*0.0463f
       let angle = t * c.frequency
-      transform[i].world.rot = tmQuaternionFromEuler(vec3(x = angle * 0.981, y = angle * 1.23, z = angle))
-      inc transform[i].version
-      discard tmCarrayTempPush(modTransform, a.entities[i], ta)
+      tr.world.rot = tmQuaternionFromEuler(vec3(x = angle * 0.981, y = angle * 1.23, z = angle))
+      inc tr.version
+      discard tmCarrayTempPush(modTransform, e, ta)
   
   entity.notify(ctx, data.engine.components[1], modTransform, tmCarraySize(modTransform).uint32)
 

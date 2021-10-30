@@ -9,7 +9,7 @@ bin = @["tm_gen"]
 # Dependencies
 
 requires "nim >= 1.6.0"
-requires "https://github.com/geekrelief/ptr_math >= 0.4.0"
+requires "https://github.com/geekrelief/ptr_math >= 0.5.0"
 
 const dev = false
 const cc = "tcc" # vcc or tcc work, but tcc needs to modify headers, gcc linker is having issues
