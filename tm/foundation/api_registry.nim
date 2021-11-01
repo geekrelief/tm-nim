@@ -2,11 +2,11 @@ template tmGetApi*(reg: ptr tmApiRegistryApi, t: typed{type}): untyped =
   cast[ptr `t`](reg.get(astToStr(t), `t version`))
 
 macro tmGetApiFor*(reg: ptr tmApiRegistryApi, dests: varargs[typed]{`var` & noalias}): untyped =
-  doAssert(dests.len > 0, "Missing arguments")
+  assert(dests.len > 0, "Missing arguments")
   result = newNimNode(nnkStmtList)
   for dest in dests:
     let ptrType = getTypeInst(dest)
-    doAssert(ptrType.kind == nnkPtrTy, &"{dest} must be a ptr to a TM type.")
+    assert(ptrType.kind == nnkPtrTy, &"{dest} must be a ptr to a TM type.")
     let t = ptrType[0]
     result.add genAst(reg, t, tname = t.strVal, dest) do:
       dest = cast[ptr t](reg.get(tname, `t version`))
@@ -26,7 +26,7 @@ template tm_set_or_remove_api*(reg: ptr tm_api_registry_api, load: bool, TYPE: u
 ]#
 
 macro tmAddOrRemoveImpl*(reg: ptr tmApiRegistryApi, load: bool, impls: varargs[typed]): untyped =
-  doAssert(impls.len > 0, "Missing impls")
+  assert(impls.len > 0, "Missing impls")
   result = newNimNode(nnkStmtList)
   for impl in impls:
     let t = getTypeImpl(impl)
@@ -34,16 +34,16 @@ macro tmAddOrRemoveImpl*(reg: ptr tmApiRegistryApi, load: bool, impls: varargs[t
       of nnkObjectTy:
          (repr(getTypeInst(impl)), newCall(ident("unsafeAddr"), impl))
       of nnkProcTy:
-        doAssert(impl.hasPragma("tmType"), &"proc {impl.strVal} is missing \"tmType\" pragma")
+        assert(impl.hasPragma("tmType"), &"proc {impl.strVal} is missing \"tmType\" pragma")
         var pragmaType = impl.getPragmaVal("tmType")
-        doAssert(pragmaType.symKind == nskType, &"proc {impl.strVal} \"tmType\" argument must be a type")
+        assert(pragmaType.symKind == nskType, &"proc {impl.strVal} \"tmType\" argument must be a type")
         var tmType = pragmaType.getImpl()
 
         if tmType.kind == nnkTypeDef:
           while (tmType[2].kind == nnkSym):
             tmType = getImpl(tmType[2])
 
-          doAssert(tmType.kind == nnkTypeDef and tmType[2].kind == nnkProcTy, &"{{.tmType: {pragmaType.repr}.}} must be a proc type for: proc {impl.strVal}")
+          assert(tmType.kind == nnkTypeDef and tmType[2].kind == nnkProcTy, &"{{.tmType: {pragmaType.repr}.}} must be a proc type for: proc {impl.strVal}")
         (pragmaType.repr, impl)
       else:
         raise newException(Defect, &"{impl.repr} must be an object or proc")

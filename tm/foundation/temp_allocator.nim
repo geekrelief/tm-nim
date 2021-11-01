@@ -9,7 +9,7 @@ proc `=destroy`*(a: var TempAllocator) =
 
 template initTempAllocator*(a: ptr tmTempAllocatorApi): TempAllocator =
   var ta = TempAllocator(api: a)
-  ta.p = a.createInBuffer(cast[ptr UncheckedArray[cchar]](ta.o.buffer[0].addr), sizeof(ta.o.buffer).uint64, nil)
+  ta.p = a.createInBuffer(cast[ptr cchar](ta.o.buffer[0].addr), sizeof(ta.o.buffer).uint64, nil)
   ta
 
 #[

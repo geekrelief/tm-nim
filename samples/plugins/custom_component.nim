@@ -75,13 +75,13 @@ proc engineUpdateCustom(inst: ptr tmEngineO, data: ptr tmEngineUpdateSetT, comma
     var
       custom = cast[ptr CustomComponentT](a.components[0])
       transform = cast[ptr tmTransformComponentT](a.components[1])
-    for i, c, tr, e in mrows(custom, transform, a.entities, a.n):
+    for _, c, tr, e in mrows(custom, transform, a.entities, a.n):
       if c.y0 == 0.0:
         c.y0 = tr.world.pos.y
       let y = c.y0 + c.amplitude * sin(float(t) * c.frequency)
-      tr.world.pos.y = y
-      tr.world.pos.x = sin(float(t) * 4523.2f)*0.0323f
-      tr.world.pos.z = cos(float(t) * 3523.2f)*0.0463f
+      tr.world.pos.x = y
+      tr.world.pos.y = sin(float(t) * 3000.5 )*0.08323f# + 0.5
+      tr.world.pos.z = cos(float(t) * 2000.712 )*0.07463# + 0.5
       let angle = t * c.frequency
       tr.world.rot = tmQuaternionFromEuler(vec3(x = angle * 0.981, y = angle * 1.23, z = angle))
       inc tr.version

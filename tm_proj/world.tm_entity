@@ -168,7 +168,7 @@ children: [
 				__type: "custom_component"
 				__uuid: "74456c1b-bc8c-0642-3d85-1331b02d83dd"
 				frequency: 4
-				amplitude: 0.300000011920929
+				amplitude: 0.800000011920929
 			}
 		]
 		components__instantiated: [
@@ -210,18 +210,18 @@ children: [
 					__uuid: "662e3b83-308f-8e61-4eeb-40ade87bac07"
 					__prototype_type: "tm_position"
 					__prototype_uuid: "da4a0e71-655e-b5b9-f00f-b025f62ee6ac"
-					x: -2.730745792388916
-					y: 1.523842334747314
-					z: 2.831315040588379
+					x: -2.626262664794922
+					y: 0.8438612222671509
+					z: 0.7446356415748596
 				}
 				local_rotation: {
 					__uuid: "21b5aed3-f01c-e43a-94c0-5b6b414132f0"
 					__prototype_type: "tm_rotation"
 					__prototype_uuid: "449c7cdf-baa2-e475-311d-9e1568956d2a"
-					x: -0.1536161750555038
-					y: -0.3822812736034393
-					z: -0.0646110326051712
-					w: 0.9088941216468811
+					x: -0.1556240022182465
+					y: -0.5542164444923401
+					z: -0.1063827499747276
+					w: 0.8107419013977051
 				}
 				local_scale: {
 					__uuid: "34bcf3cc-8414-c181-9b6c-395423bfcfdb"
