@@ -4,4 +4,6 @@
 *.lib
 *.def
 *.pdg
+*.pdb
+build
 tm_generated.nim
