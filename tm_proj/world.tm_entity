@@ -210,23 +210,65 @@ children: [
 					__uuid: "662e3b83-308f-8e61-4eeb-40ade87bac07"
 					__prototype_type: "tm_position"
 					__prototype_uuid: "da4a0e71-655e-b5b9-f00f-b025f62ee6ac"
-					x: -2.626262664794922
-					y: 0.8438612222671509
-					z: 0.7446356415748596
+					x: -2.229587554931641
+					y: 1.276505708694458
+					z: 1.363022804260254
 				}
 				local_rotation: {
 					__uuid: "21b5aed3-f01c-e43a-94c0-5b6b414132f0"
 					__prototype_type: "tm_rotation"
 					__prototype_uuid: "449c7cdf-baa2-e475-311d-9e1568956d2a"
-					x: -0.1556240022182465
-					y: -0.5542164444923401
-					z: -0.1063827499747276
-					w: 0.8107419013977051
+					x: -0.1964670568704605
+					y: -0.4765181541442871
+					z: -0.1101645678281784
+					w: 0.8498204946517944
 				}
 				local_scale: {
 					__uuid: "34bcf3cc-8414-c181-9b6c-395423bfcfdb"
 					__prototype_type: "tm_scale"
 					__prototype_uuid: "892f25d7-8996-eacd-e827-c7d47db047fb"
+					x: 0.9999999403953552
+					y: 1
+					z: 1
+				}
+			}
+		]
+	}
+	{
+		__uuid: "8f053ebc-760f-232a-fe5e-c11999f841a1"
+		__prototype_type: "tm_entity"
+		__prototype_uuid: "18b3ae96-1abf-bdcf-6e18-a5b500638249"
+		name: "camera_1"
+		components__instantiated: [
+			{
+				__type: "tm_transform_component"
+				__uuid: "cceb9e88-7919-4a93-7323-90cea51e59cc"
+				__prototype_type: "tm_transform_component"
+				__prototype_uuid: "6ec9b699-cc83-8d51-62c3-f72f2c6479d2"
+				local_position: {
+					__uuid: "e745cb0a-841d-e035-cfb3-1572c5c20144"
+					__prototype_type: "tm_position"
+					__prototype_uuid: "da4a0e71-655e-b5b9-f00f-b025f62ee6ac"
+					x: 1.732682466506958
+					y: 1.276505708694458
+					z: -3.776970386505127
+				}
+				local_rotation: {
+					__uuid: "2ada6edf-46f3-2cd2-6fac-7db80a5d8c3a"
+					__prototype_type: "tm_rotation"
+					__prototype_uuid: "449c7cdf-baa2-e475-311d-9e1568956d2a"
+					x: 0.03582753613591194
+					y: -0.9636960029602051
+					z: -0.2018855661153793
+					w: -0.171021893620491
+				}
+				local_scale: {
+					__uuid: "505da577-c2cd-dd9a-c11a-a9bb0429b8d4"
+					__prototype_type: "tm_scale"
+					__prototype_uuid: "892f25d7-8996-eacd-e827-c7d47db047fb"
+					x: 0.9999999403953552
+					y: 1
+					z: 1
 				}
 			}
 		]

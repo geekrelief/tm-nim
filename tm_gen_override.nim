@@ -15,6 +15,7 @@ cOverride:
 
   type
     tm_simulation_state_o* {.inheritable.} = object
+    tm_component_manager_o* {.inheritable.} = object # entity.h
     tm_plugin_o* = object
     tm_temp_allocator_o* = object
 

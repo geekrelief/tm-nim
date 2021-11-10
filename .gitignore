@@ -3,4 +3,5 @@
 *.exp
 *.lib
 *.def
+*.pdg
 tm_generated.nim
