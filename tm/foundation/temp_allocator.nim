@@ -7,10 +7,10 @@ proc `=destroy`*(a: var TempAllocator) =
   if a.p != nil:
     a.api.destroy(a.p)
 
-template initTempAllocator*(a: ptr tmTempAllocatorApi): TempAllocator =
+template init*(a: ptr tmTempAllocatorApi): ptr tmTempAllocatorI =
   var ta = TempAllocator(api: a)
   ta.p = a.createInBuffer(cast[ptr cchar](ta.o.buffer[0].addr), sizeof(ta.o.buffer).uint64, nil)
-  ta
+  ta.p
 
 #[
 // Declares and initializes a regular allocator interface `a` from the temp allocator interface

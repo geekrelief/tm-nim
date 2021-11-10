@@ -10,13 +10,13 @@ proc tmCarrayCapacity*(a: pointer): uint64 {.inline.} =
 proc tmCarrayNeedsToGrow*(a: pointer, n: uint64): bool {.inline.} = 
   n > tmCarrayCapacity(a)
 
-proc tmCarrayTempGrow*[T](a: var ptr T, n: uint64, ta: TempAllocator) {.inline.} =  
-  a = cast[ptr T](tmCarrayTempGrowInternal(a, n, sizeof(T).uint64, ta.p))
+proc tmCarrayTempGrow*[T](a: var ptr T, n: uint64, ta: ptr tmTempAllocatorI) {.inline.} =  
+  a = cast[ptr T](tmCarrayTempGrowInternal(a, n, sizeof(T).uint64, ta))
 
-proc tmCarrayTempEnsure*[T](a: var ptr T, n: uint64, ta: TempAllocator) = 
+proc tmCarrayTempEnsure*[T](a: var ptr T, n: uint64, ta: ptr tmTempAllocatorI) = 
   if tmCarrayNeedsToGrow(a, n): tmCarrayTempGrow(a, n, ta)
 
-proc tmCarrayTempPush*[T](a: var ptr T, item: T, ta: TempAllocator): ptr T =
+proc tmCarrayTempPush*[T](a: var ptr T, item: T, ta: ptr tmTempAllocatorI): ptr T =
   tmCarrayTempEnsure(a, tmCarraySize(a) + 1, ta)
   a[tm_carray_header(a).size.int] = item
   inc tm_carray_header(a).size 

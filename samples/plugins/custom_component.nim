@@ -79,7 +79,7 @@ proc componentCreate(ctx: ptr tmEntityContextO) {.cdecl, tmType: tmEntityCreateC
 
 proc engineUpdateCustom(inst: ptr tmEngineO, data: ptr tmEngineUpdateSetT, commands: ptr tmEntityCommandsO) {.cdecl.} =
   var 
-    ta = tempAllocatorApi.initTempAllocator()
+    ta = tempAllocatorApi.init()
     modTransform: ptr tmEntityT
     ctx = cast[ptr tmEntityContextO](inst)
     t = 0'f64
