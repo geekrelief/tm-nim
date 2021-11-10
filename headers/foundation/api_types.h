@@ -75,15 +75,15 @@ typedef struct tm_str_t
 } tm_str_t;
 
 // Creates a [[tm_str_t]] from a `char *` `s`.
-#define tm_str(s) (TM_LITERAL(tm_str_t){ .data = (s), .size = s ? (uint32_t)strlen(s) : 0, .null_terminated = true })
+#define tm_str(s) (TM_LITERAL(tm_str_t){ (s), s ? (uint32_t)strlen(s) : 0, true })
 
 // Creates a [[tm_str_t]] from a static string `s`. As [[tm_str()]], but uses `sizeof()` instead of
 // `strlen()` to determine the length of the string. This means it avoids the `strlen()` overhead
 // and can be used to initialize static data, but it can only be used with static strings.
-#define TM_STR(s) (TM_LITERAL(tm_str_t){ .data = ("" s ""), .size = (uint32_t)(sizeof("" s "") - 1), .null_terminated = true })
+#define TM_STR(s) (TM_LITERAL(tm_str_t){ ("" s ""), (uint32_t)(sizeof("" s "") - 1), true })
 
 // Creates a [[tm_str_t]] from a start pointer `s` and end pointer `e`.
-#define tm_str_range(s, e) (TM_LITERAL(tm_str_t){ .data = (s), .size = (uint32_t)((e) - (s)) })
+#define tm_str_range(s, e) (TM_LITERAL(tm_str_t){ (s), (uint32_t)((e) - (s)), false })
 
 // Represents a time from the system clock.
 //
@@ -165,6 +165,12 @@ typedef struct tm_tt_id_t
 {
     uint64_t u64;
 } tm_tt_id_t;
+
+static inline tm_tt_type_t tm_tt_type(tm_tt_id_t id)
+{
+    tm_tt_type_t res = { id.u64 & 0x3ff };
+    return res;
+}
 
 #endif
 
@@ -394,8 +400,8 @@ typedef uint64_t tm_strhash_t;
 // "C". If you forget extern "C", the first declaration will get C++ linkage and you will then get a
 // conflict on the second declaration.
 #ifdef __cplusplus
-void use_extern_c_wrapper_to_include_the_machinery_headers_in_cpp_files();
-extern "C" void use_extern_c_wrapper_to_include_the_machinery_headers_in_cpp_files();
+void use_extern_c_wrapper_to_include_the_machinery_headers_in_cpp_files(void);
+extern "C" void use_extern_c_wrapper_to_include_the_machinery_headers_in_cpp_files(void);
 #endif
 
 // Returns the `name` as a string.
@@ -440,12 +446,10 @@ extern "C" void use_extern_c_wrapper_to_include_the_machinery_headers_in_cpp_fil
 #if defined(TM_OS_WINDOWS)
 
 #if defined(TCC)
-
 #define TM_DISABLE_PADDING_WARNINGS
-
 #define TM_RESTORE_PADDING_WARNINGS
-
 #else
+
 // Disable warnings about padding inserted into structs. Use this before including external headers
 // that do not explicitly declare padding. Restore the padding warning afterwards with
 // [[TM_RESTORE_PADDING_WARNINGS]].
@@ -457,12 +461,18 @@ extern "C" void use_extern_c_wrapper_to_include_the_machinery_headers_in_cpp_fil
 #define TM_RESTORE_PADDING_WARNINGS \
     __pragma(warning(pop))
 #endif
-#else
+#elif defined(__clang__)
 #define TM_DISABLE_PADDING_WARNINGS  \
     _Pragma("clang diagnostic push") \
         _Pragma("clang diagnostic ignored \"-Wpadded\"")
 #define TM_RESTORE_PADDING_WARNINGS \
     _Pragma("clang diagnostic pop")
+#elif defined(__GNUC__) || defined(__GNUG__)
+#define TM_DISABLE_PADDING_WARNINGS \
+    _Pragma("GCC diagnostic push")  \
+        _Pragma("GCC diagnostic ignored \"-Wpadded\"")
+#define TM_RESTORE_PADDING_WARNINGS \
+    _Pragma("GCC diagnostic pop")
 #endif
 
 #if !defined(__ZIG__) && !defined(__cplusplus)

@@ -11,17 +11,17 @@ requires "https://github.com/geekrelief/ptr_math >= 0.6.0"
 
 #> configuration variables
 const mode = "--debugger:native --debuginfo:on" # -d:danger, -d:release
-const cc = "vcc" # vcc or tcc work, but tcc needs to modify headers, gcc linker is having issues
+const cc = "tcc" # vcc or tcc work, but tcc needs to modify headers, gcc linker is having issues
 
 const samples_dir = "samples/plugins/"
 const build_dir = "C:/tm/tm-nim/build/samples/plugins/"
 const tm_plugins_dir = "C:/tm/gr-tm/bin/Debug/plugins/"
 #< configuration variables
 
-const dev = false # bindings development flag
+const dev = true # bindings development flag
 
 when not defined(dev):
-  requires "https://github.com/geekrelief/nimterop >= 0.8.4"
+  requires "https://github.com/geekrelief/nimterop >= 0.8.5"
 
 import globals
 import strformat, strutils
@@ -34,6 +34,8 @@ proc taskParams(): seq[string] = # nimble's paramCount / paramStr is broken in v
   else:
     @[]
   
+task removePragmaOnce, "Removes pragma once":
+  exec "nim r remove_pragma_once.nim"
 
 task gen, "Generate the binding":
   if dev:

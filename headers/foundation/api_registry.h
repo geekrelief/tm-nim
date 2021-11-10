@@ -37,7 +37,9 @@ struct tm_temp_allocator_i;
 // }
 // ~~~
 //
-// Now you can use [[tm_os_api]] and [[tm_unicode_api]] anywhere in your file.
+// Now you can use [[tm_os_api]] and [[tm_unicode_api]] anywhere in your file. Requesting APIs like
+// this will also add *dependencies* to these APIs for your plugin. If the dependencies can't be
+// fulfilled, the plugin will be disabled. See more below.
 //
 // To register an API, you use the [[tm_set_or_remove_api()]] macro in your [[tm_plugin_load_f]]:
 //
@@ -46,6 +48,8 @@ struct tm_temp_allocator_i;
 //     .my_api_function = my_api_function,
 //     .other_api_function = other_api_function,
 // };
+//
+// #define tm_my_plugin_api_version TM_VERSION(1, 0, 0)
 //
 // TM_DLL_EXPORT void tm_load_plugin(struct tm_api_registry_api *reg, bool load)
 // {
@@ -58,8 +62,8 @@ struct tm_temp_allocator_i;
 // use it, using the declarations in the header file.
 //
 // Note that the [[tm_set_or_remove_api()]] macro performs two functions. When the plugin is loaded
-// (`load == true`), it adds the API to the registry. When the plugin is unloaded (`load ==
-// false`), it removes the API from the registry.
+// (`load == true`), it adds the API to the registry. When the plugin is unloaded (`load == false`),
+// it removes the API from the registry.
 //
 // ## Interfaces
 //
@@ -82,15 +86,13 @@ struct tm_temp_allocator_i;
 // ## Hot reloading
 //
 // The API registry is built to support hot reloading of APIs. When a plugin is hot-reloaded, the
-// old version's [[tm_plugin_load_f]] function is called with `load == false`. This will remove
-// its APIs from the registry. When the API is removed, the function table is still kept in memory,
-// it's just cleared out with NULL pointers. Then, the new version's [[tm_plugin_load_f]] function
-// is called with `load == true`. This will copy the new function pointers into the API table.
-// Callers using the API table obtained from [[tm_get_api()]] will automatically call the new
-// functions.
+// old version's [[tm_plugin_load_f]] function is called with `load == false`. This will remove its
+// APIs from the registry. When the API is removed, the function table is still kept in memory, it's
+// just cleared out with NULL pointers. Then, the new version's [[tm_plugin_load_f]] function is
+// called with `load == true`. This will copy the new function pointers into the API table. Callers
+// using the API table obtained from [[tm_get_api()]] will automatically call the new functions.
 //
-// !!! TODO: TODO
-//     Add a note about hot reloading of interfaces.
+// !!! TODO: TODO Add a note about hot reloading of interfaces.
 //
 // ## Load order
 //
@@ -110,8 +112,8 @@ struct tm_temp_allocator_i;
 // ~~~
 //
 // An exception to this rule is that you can assume that all foundation APIs have been loaded before
-// your plugin's [[tm_plugin_load_f]] function gets called. So it's safe to use things like [[tm_api_registry_api]]
-// and [[tm_allocator_api]].
+// your plugin's [[tm_plugin_load_f]] function gets called. So it's safe to use things like
+// [[tm_api_registry_api]] and [[tm_allocator_api]].
 //
 // If you want to use another API as part of the initialization of your plugin, you need to wait
 // until all plugins have been loaded. You can do that by registering a [[tm_plugin_init_i]]
@@ -145,18 +147,22 @@ struct tm_temp_allocator_i;
 // ## Optional APIs
 //
 // When you call [[tm_get_api()]] you are saying that your plugin depends on that API. If that API
-// is not available, an error will be generated and your plugin will be unloaded.
+// is not available, an error will be generated and your plugin will be disabled.
 //
-// Sometimes, you want to use an API if it's available, but you are not dependent on it. (Maybe
-// it just provides some nice to have features.) In this case, you can use [[tm_get_optional_api()]].
+// Sometimes, you want to use an API if it's available, but you are not dependent on it. (Maybe it
+// just provides some nice to have features.) In this case, you can use [[tm_get_optional_api()]].
 //
 // ~~~c
-// tm_my_plugin_api = tm_get_optional_api(reg, tm_my_plugin_api);
+// tm_get_optional_api(reg, &tm_my_plugin_api_opt, tm_my_plugin_api);
 // ~~~
 //
-// You can later check if the API was available by calling [[version()]], or checking if the
-// function pointers are NULL or not. Note that you must perform this check after the whole load
-// process has completed.
+// You can later check if the API was available by checking if `tm_my_plugin_api_opt` is NULL. Note
+// that you must perform this check after loading has completed:
+//
+// ~~~c
+// if (tm_my_plugin_api_opt)
+//     tm_my_plugin_api_opt->do_stuff();
+// ~~~
 //
 // ## Plugin versioning
 //
@@ -174,8 +180,8 @@ struct tm_temp_allocator_i;
 // #define tm_my_api_version TM_VERSION(1, 0, 2)
 // ~~~
 //
-// The version of an API consists of three parts (*major*, *minor*, *patch*) using the SemVer
-// semantic versioning scheme: https://semver.org/.
+// The version of an API consists of three parts (*major*, *minor*, *patch*) using the
+// [SemVer](https://semver.org/) semantic versioning scheme:
 //
 // * The major version is changed for any breaking change.
 // * The minor version is changed when new functionality is added in a backwards-compatible way.
@@ -191,10 +197,9 @@ struct tm_temp_allocator_i;
 // Note that adding functions in the middle of the API or changing the type of parameters or struct
 // fields is not backwards compatible.
 //
-// A call to `tm_get_api(reg, tm_my_api)` is expanded to `reg->get("tm_my_api",
-// tm_my_api_version)`. When this is compiled, `tm_my_api_version` is locked to the current value.
-// If you recompile the plugin with newer APIs, it will be locked to the updated
-// `tm_my_api_version`.
+// A call to `tm_get_api(reg, tm_my_api)` is expanded to `reg->get("tm_my_api", tm_my_api_version)`.
+// When this is compiled, `tm_my_api_version` is locked to the current value. If you recompile the
+// plugin with newer APIs, it will be locked to the updated `tm_my_api_version`.
 //
 // When you are requesting a specific version of an API, you may get back any compatible version
 // (same major version, same or newer minor version). If no compatible version is found, an error
@@ -204,36 +209,35 @@ struct tm_temp_allocator_i;
 //
 // **Compatibility with new minor versions**:
 //
-// If you compiled your plugin for (1, 0, 0) and a new engine comes out with API (1, 1, 0), your
-// plugin will continue to work. Your request for (1, 0, 0) will be fulfilled by (1, 1, 0) which should be
-// backwards compatible with (1, 0, 0). However if a new engine version comes out with (2, 0, 0)
-// your plugin will be disabled since it is not compatible with the new API.
+// If you compiled your plugin for 1.0.0 and a new engine comes out with API 1.1.0, your plugin will
+// continue to work. Your request for 1.0.0 will be fulfilled by 1.1.0 which should be backwards
+// compatible with 1.0.0. However if a new engine version comes out with 2.0.0 your plugin will be
+// disabled since it is not compatible with the new API.
 //
 // **Compatibility with older minor versions**:
 //
-// If the current API version is at (1, 1, 0), but you want your plugin to work with (1, 0, 0),
-// you should explicitly request that version, instead of just using [[tm_get_api()]] (which will
-// always get the latest version):
+// If the current API version is at 1.1.0, but you want your plugin to work with 1.0.0, you should
+// explicitly request that version, instead of just using [[tm_get_api()]] (which will always get
+// the latest version):
 //
 // ~~~c
-// tm_my_api = reg->get("tm_my_api", TM_VERSION(1, 0, 0));
+// tm_my_api = reg->get(TM_STRINGIFY(tm_my_api), TM_VERSION(1, 0, 0));
 // ~~~
 //
-// Depending on what API you are running against, this might return (1, 0, 0), (1, 1, 0) or even
-// (1, 97, 0). (If you were requesting (1, 1, 0), but only (1, 0, 0) was available, you would
-// get an error and your plugin would be unloaded, since in this case you are saying that you want
-// to use (1, 1, 0) features, which are not available in (1, 0, 0).
+// Depending on what API you are running against, this might return 1.0.0, 1.1.0 or even 1.97.0. (If
+// you were requesting 1.1.0, but only 1.0.0 was available, you would get an error and your plugin
+// would be unloaded, since in this case you are saying that you want to use 1.1.0 features, which
+// are not available in 1.0.0.
 //
-// You can check which version you actually got by calling [[version()]] on the returned
-// `tm_my_api` pointer. You can also check if function pointers that were added in (1, 1, 0) are
-// available or not.
+// You can check which version you actually got by calling [[version()]] on the returned `tm_my_api`
+// pointer. You can also check if function pointers that were added in 1.1.0 are available or not.
 //
 // **Compatiblity with new major versions**:
 //
-// If you've compiled your plugin for (1, 0, 0) and a new engine comes out with (2, 0, 0), your
-// plugin will not work with the old API. The only way your plugin will work in this scenario is if
-// the API developer has decided to continue to support the (1, 0, 0) version of the API. They can
-// do this by making separate [[tm_set_or_remove_old_api_version()]] calls for each version:
+// If you've compiled your plugin for 1.0.0 and a new engine comes out with 2.0.0, your plugin will
+// not work with the new API. The only way your plugin will work in this scenario is if the API
+// developer has decided to continue to support the 1.0.0 version of the API. They can do this by
+// making separate [[tm_set_or_remove_old_api_version()]] calls for each version:
 //
 // ~~~c
 // struct tm_my_api_v100 {
@@ -253,28 +257,28 @@ struct tm_temp_allocator_i;
 // ~~~
 //
 // If the API developer has done this, your plugin will continue to work with their new plugin
-// version. When you request (1, 0, 0), you will get the old `tm_my_api_v100` version exported by
-// the plugin.
+// version. When you request 1.0.0, you will get the old `tm_my_api_v100` version exported by the
+// plugin.
 //
-// For your own plugins, you can decide whether you want to continue to support old API versions
-// or not. Doing so means more work, since you need to support more API versions, but less
-// frustrations for your users.
+// For your own plugins, you can decide whether you want to continue to support old API versions or
+// not. Doing so means more work, since you need to support more API versions, but less frustration
+// for your users.
 //
 // **Compatibility with older major versions**:
 //
 // If you want your plugin to be compatible with multiple older major versions of the API, you can
-// request all the older versions of the API using [[tm_get_old_api_version()]] and use
+// request all the older versions of the API using [[tm_get_optional_old_api_version()]] and use
 // whatever is available:
 //
 // ~~~c
-// tm_my_api_v10 = tm_get_old_api_version(reg, tm_my_api_v10);
-// tm_my_api_v20 = tm_get_old_api_version(reg, tm_my_api_v20);
-// tm_my_api_v30 = tm_get_old_api_version(reg, tm_my_api_v30);
-// tm_my_api = tm_get_optional_api(reg, tm_my_api);
+// tm_get_optional_old_api_version(&tm_my_api_v10, reg, tm_my_api_v10);
+// tm_get_optional_old_api_version(&tm_my_api_v20, reg, tm_my_api_v20);
+// tm_get_optional_old_api_version(&tm_my_api_v30, reg, tm_my_api_v30);
+// tm_get_optional_api(&tm_my_api, reg, tm_my_api);
 // ~~~
 //
-// Note that the call to get the latest API version uses [[tm_get_optional_api()]], since we don't
-// want to fail if that version is not available. (In that case we will use one of the older versions.)
+// Note that we use *optional* calls here, since we don't want to fail if the versions are not
+// available.
 
 // Listener for receiving information about changes to the API registry. Use [[add_listener()]] to add
 // a listener to the API registry.
@@ -326,8 +330,8 @@ struct tm_api_registry_api
 
     // Gets a pointer to the API implementing the API `name` with a matching `version`.
     //
-    // Versions match if they have the same major version number, except if the major version
-    // number is zero in which case an exact match is required.
+    // Versions match if they have the same major version number, except if the major version number
+    // is zero in which case an exact match is required.
     //
     // `get(name)` is guaranteed to always return the same pointer, throughout the lifetime of an
     // application (whether `set(name)` has been called zero, one or multiple times). It returns a
@@ -347,21 +351,31 @@ struct tm_api_registry_api
     // not, or call [[version()]].
     //
     // Calling [[get()]] from a plugin indicates that your plugin is dependent on the requested API.
-    // If the API is not available, an error will be generated. If your plugin is not dependent on
-    // the API, use [[get_optional()]] instead.
+    // If the API is not available, an error will be generated during the
+    // [[disable_apis_missing_dependencies()]] phase and your plugin will be disabled. If your
+    // plugin is not dependent on the API, use [[get_optional()]] instead.
     //
     // You typically use the [[tm_get_api()]] macro instead of calling this function directly.
     void *(*get)(const char *name, tm_version_t version);
 
-    // As [[get()]], but indicates that this is an optional API, i.e. your plugin should beable to
-    // continue to run even if this API is not available.
+    // As [[get()]], but used for *optional* APIs. This means that if the API is available, your
+    // plugin will use it, but if it's not, your plugin will still be able to run.
     //
-    // If you use [[get_optional()]] to get an API, you should test if you actually got non-NULL
-    // function pointers back before using them.
+    // [[get_optional()]] does not create a dependency on the API, your plugin will be allowed to
+    // run even if the API is not available.
+    //
+    // Note that unlike [[get()]], [[get_optional()]] takes a pointer to the API pointer as its
+    // argument. This pointer is saved and set to the API pointer if a matching  [[set()]] call is
+    // made. This means that you can test the pointer to check if the API is available or not:
+    //
+    // ~~~c
+    // if (tm_my_api_opt)
+    //     tm_my_api_opt->foo();
+    // ~~~
     //
     // You typically use the [[tm_get_optional_api()]] macro instead of calling this function
     // directly.
-    void *(*get_optional)(const char *name, tm_version_t version);
+    void (*get_optional)(void **api, const char *name, tm_version_t version);
 
     // Returns the loaded version of the API `api`. If the API is not loaded, returns `{0, 0, 0}`.
     //
@@ -478,7 +492,7 @@ struct tm_api_registry_api
     tm_version_t *(*available_versions)(const char *name, struct tm_temp_allocator_i *ta);
 };
 
-#define tm_api_registry_api_version TM_VERSION(0, 3, 0)
+#define tm_api_registry_api_version TM_VERSION(1, 0, 0)
 
 // Uses [[get()]] to get the current version of the API `TYPE`. Relies on a `TYPE_version` define
 // to get the version.
@@ -486,10 +500,13 @@ struct tm_api_registry_api
     (struct TYPE *)reg->get(#TYPE, TYPE##_version)
 
 // As [[tm_get_api()]], but calls [[get_optional()]].
-#define tm_get_optional_api(reg, TYPE) \
-    (struct TYPE *)reg->get_optional(#TYPE, TYPE##_version)
+#define tm_get_optional_api(reg, ptr, TYPE)                           \
+    do {                                                              \
+        struct TYPE **typed_ptr = ptr;                                \
+        reg->get_optional((void **)typed_ptr, #TYPE, TYPE##_version); \
+    } while (0)
 
-// Returns on older version of an API. `VERSION_TYPE` should be the type name of a struct defining
+// Returns an older version of an API. `VERSION_TYPE` should be the type name of a struct defining
 // the old API. This macro depends on there being `VERSION_TYPE_name` and `VERSION_TYPE_version`
 // macros that define the name and the version of the API. E.g.:
 //
@@ -503,7 +520,14 @@ struct tm_api_registry_api
 // tm_my_api_v100 = tm_get_old_api_version(reg, tm_my_api_v100);
 // ~~~
 #define tm_get_old_api_version(reg, VERSION_TYPE) \
-    (struct VERSION_TYPE *)reg->get_optional(VERSION_TYPE##_name, VERSION_TYPE##_version)
+    (struct VERSION_TYPE *)reg->get(VERSION_TYPE##_name, VERSION_TYPE##_version)
+
+// As [[tm_get_old_api_version()]], but calls [[get_optional()]].
+#define tm_get_optional_old_api_version(reg, ptr, VERSION_TYPE)                             \
+    do {                                                                                    \
+        struct VERSION_TYPE **typed_ptr = ptr;                                              \
+        reg->get_optional((void **)typed_ptr, VERSION_TYPE##_name, VERSION_TYPE##_version); \
+    } while (0)
 
 // If `load` is *true*, uses [[set()]] to set the current version of the API `TYPE` to the specified
 // `ptr`. If `load` is *false*, removes the API with [[remove()]]. Relies on a `TYPE_version` macro

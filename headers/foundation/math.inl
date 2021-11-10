@@ -205,7 +205,7 @@ static inline tm_vec4_t tm_vec4_abs(tm_vec4_t v);
 
 // Returns the identity matrix.
 // $ \begin{bmatrix}1&0&0&0\\0&1&0&0\\0&0&1&0\\0&0&0&1\end{bmatrix} $
-static inline const tm_mat44_t *tm_mat44_identity();
+static inline const tm_mat44_t *tm_mat44_identity(void);
 
 // Creates a matrix transformation that translates any point by offset `t`.
 // $ \begin{bmatrix}1&0&0&0\\0&1&0&0\\0&0&1&0\\t_x&t_y&t_z&1\end{bmatrix} $

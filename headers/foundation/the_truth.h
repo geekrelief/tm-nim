@@ -485,6 +485,12 @@ typedef void tm_the_truth_destroyed_i(tm_the_truth_o *tt);
 // Version of [[tm_the_truth_destroyed_i]] registered with the API registry.
 #define tm_the_truth_destroyed_i_version TM_VERSION(1, 0, 0)
 
+// Interface called after a Hot Reload has occured.
+typedef void tm_the_truth_hot_reload_i(tm_the_truth_o *tt);
+
+// Version of [[tm_the_truth_hot_reload_i]] registered with the API registry.
+#define tm_the_truth_hot_reload_i_version TM_VERSION(1, 0, 0)
+
 // Argument to [[tm_the_truth_api->create()]] specifying whether the Truth should be set up with
 // the types defined in [[tm_the_truth_create_types_i]] or not.
 enum tm_the_truth_create_types {
@@ -829,8 +835,10 @@ struct tm_the_truth_api
     void (*set_property_aspect)(tm_the_truth_o *tt, tm_tt_type_t object_type, uint32_t property,
         tm_strhash_t aspect, const void *data);
 
-    // Called after a plugin hot reload to reload the aspects.
-    void (*reload_aspects)(tm_the_truth_o *tt);
+    // Called after a plugin hot reload. Reloads The Truth types by calling implementatoins of
+    // [[tm_the_truth_create_types_i]] and enables general post hot-reload behavior by calling
+    // all implementations of [[tm_the_truth_hot_reload_i]].
+    void (*hot_reload)(tm_the_truth_o *tt);
 
     // Querying types
 
@@ -1744,7 +1752,7 @@ struct tm_the_truth_api
         uint32_t property);
 };
 
-#define tm_the_truth_api_version TM_VERSION(1, 1, 0)
+#define tm_the_truth_api_version TM_VERSION(1, 1, 1)
 
 // Convenience macro for quick reading of object data.
 #define tm_tt_read(tt, object) tm_the_truth_api->read(tt, object)

@@ -72,5 +72,12 @@
 #define TM_DIRSEP "/"
 #endif
 
+#if defined(TM_OS_WINDOWS)
+#define TM_DLL_EXT "dll"
+#elif defined(TM_OS_MACOSX)
+#define TM_DLL_EXT "dylib"
+#elif defined(TM_OS_LINUX)
+#define TM_DLL_EXT "so"
+#endif
 
 #endif

@@ -134,5 +134,7 @@ extern struct tm_error_api *tm_error_api;
 // ~~~~
 #define TM_NOT_YET_IMPLEMENTED(ei) TM_ERROR(ei, "%s() not yet implemented", __func__)
 
+// Used to mark a function that has been deprecated and will be potentially deleted in a future release.
+#define TM_DEPRECATED(ei, message) TM_ERROR(ei, "function `%s` has been deprecated. %s", __func__, message)
 
 #endif

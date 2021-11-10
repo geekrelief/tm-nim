@@ -9,6 +9,7 @@ for p in walkDirRec(headerDir):
   var (path, name, ext) = p.splitFile
   var flag = (path.splitPath[1] & "_" & name).toUpperAscii
   var data = readFile(p)
-  data = data.replace("#pragma once", &"#ifndef {flag}\p#define {flag}")
-  data &= "\n\n#endif"
-  writeFile(p, data)
+  if data.find("#pragma once") != -1:
+    data = data.replace("#pragma once", &"#ifndef {flag}\p#define {flag}")
+    data &= "\n\n#endif"
+    writeFile(p, data)

@@ -53,15 +53,6 @@
 //     tm_hash_get_rv(&h, 3);
 //     ~~~
 //
-// !!! WARNING: Thread-safety
-//     For optimization and ease of use, [[tm_hash_get()]] stores a temporary value in the hash structure.
-//     This means that it's not thread safe to call [[tm_hash_get()]] on the same hash table from multiple
-//     threads simultaneously (even though [[tm_hash_get()]] does not modify the content of the hash
-//     table). To be thread-safe, use [[tm_hash_get_ts()]].
-//
-// !!! NOTE: TODO: Fix this?
-//     Should we provide an alternative solution for this? This non-thread safety can be a scary trap.
-//
 // ### Implementation notes
 //
 // [[hash.inl]] uses a macro (`TM_TT_HASH_T`) to define a struct with `keys` and `values` arrays as
@@ -107,7 +98,11 @@
 // average fill rate of (75 + 75/2)/2 = 56 %.
 //
 // A default value is stored in the struct. This is returned when the key is not found and is by
-// default zero-initialized with the rest of the struct.
+// default zero-initialized with the rest of the struct. The defalut value is also stored in the
+// slot `values[-1]`. This allows us to implement [[tm_hash_get()]] with just one lookup of the hash
+// index `h->values[tm_hash_index(h,key)]` where [[tm_hash_index()]] has been implemented to return
+// `-1` for missing keys. Note that this means that if you want to change the default value of
+// a non-empty hash (not recommended), you must also change `values[-1]`.
 //
 // Rvalue issue
 // :    To pass the key to the C functions, we have to take its address with `&key`. Unfortunately, this
@@ -118,13 +113,13 @@
 //      (typeof(key)[1]){key}
 //      ~~~
 //
-// Thread safety
-// :    The hash struct also has a `temp` variable. This is used to store temporary variables inside
-//      macros so we don't have to evalute expressions more than once. It's a bit ugly, because it makes
-//      the macros that use it not thread-safe (two threads could set different values for `temp`) even
-//      if they don't modify any other parts of the hash. Again, this is something that could be fixed
-//      with the right compiler support (support for temp variables in macros), which GCC and Clang has,
-//      but not MSVC.
+// Default value at `values[-1]`
+// :    Having the default value at `values[-1]` has the drawback of requiring an extra memory slot
+//      and making the values array not power-of-two sized. We could fix this by using either the
+//      [GNU extension that allows for local macro variables](https://gcc.gnu.org/onlinedocs/cpp/Duplication-of-Side-Effects.html)
+//      or the [typeof()](https://gcc.gnu.org/onlinedocs/gcc/Typeof.html) extension. Unfortunately,
+//      neither of these are available in Visual Studio (and we want to keep compatibility with
+//      the Visual Studio compiler).
 //
 // To do
 // :    Should we support other key widths? 32-bit? 128-bit?
@@ -202,7 +197,7 @@ static const uint64_t TM_HASH_UNUSED = 0xffffffffffffffffULL;
 //     uint32_t num_used;
 //
 //     // Temp storage for an index value.
-//     uint32_t temp;
+//     int32_t temp;
 //
 //     // Arrays of hash table keys and values.
 //     //
@@ -219,8 +214,10 @@ static const uint64_t TM_HASH_UNUSED = 0xffffffffffffffffULL;
 //     // to use a power-of-two value for `num_buckets` if you set it yourself.
 //     struct tm_allocator_i *allocator;
 //
-//     // Default value of the hash table. This will be returned if you call [[tm_hash_get()]] with a missing
-//     // key.
+//     // Default value of the hash table. This will be returned if you call `tm_hash_get()` with a missing
+//     // key. The default value should be set when you initialize the hash struct. If you change the
+//     // default value of a non-empty hash (not recommended), you must also change `values[-1]`
+//     // because it caches a copy of the default value.
 //     V default_value;
 // }
 // ~~~
@@ -228,7 +225,7 @@ static const uint64_t TM_HASH_UNUSED = 0xffffffffffffffffULL;
     {                                                          \
         uint32_t num_buckets;                                  \
         uint32_t num_used;                                     \
-        uint32_t temp;                                         \
+        int32_t temp;                                          \
         uint32_t padding_1;                                    \
         K *keys;                                               \
         V *values;                                             \
@@ -300,7 +297,7 @@ static const uint64_t TM_HASH_UNUSED = 0xffffffffffffffffULL;
 #define tm_hash__validate_key_type(h, key) \
     (0 && ((h)->keys[0] = (key), 0) && sizeof(char[sizeof(key) == sizeof((h)->keys[0]) && sizeof((h)->keys[0]) == 8 ? 1 : -1]))
 
-// Returns the index in the hash table where the `key` is stored, or `UINT32_MAX` if `key` is
+// Returns the index in the hash table where the `key` is stored, or `-1` if `key` is
 // not in the hash table.
 #define tm_hash_index(h, key)                                                                     \
     TM_HASH__DISABLE_WARNINGS()                                                                   \
@@ -309,73 +306,52 @@ static const uint64_t TM_HASH_UNUSED = 0xffffffffffffffffULL;
         TM_HASH__RESTORE_WARNINGS()
 
 // Returns *true* if the hash table contains `key`.
-#define tm_hash_has(h, key) (tm_hash_index(h, key) != UINT32_MAX)
+#define tm_hash_has(h, key) (tm_hash_index(h, key) != -1)
 
 // Counts the number of real keys is the hash table.
 #define tm_hash_count(h) (tm_hash__num_real_keys((const uint64_t *)(h)->keys, (h)->num_buckets))
 
 // Returns the value stored for `key` in the hash table. If the key has not been stored, the
 // `default_value` of the hash table is returned.
-//
-// !!! WARNING: Not thread-safe
-//     This function uses the `temp` field and thus is not safe to call simultaneously from
-//     multiple threads. In a multi-thread context, use [[tm_hash_get_ts()]] instead.
-#define tm_hash_get(h, key)                           \
-    (*(uint32_t *)&(h)->temp = tm_hash_index(h, key), \
-        (h)->temp != UINT32_MAX ? (h)->values[(h)->temp] : (h)->default_value)
-
-// A thread-safe version of [[tm_hash_get()]] that uses an explicitly passed temporary variable,
-// instead of the one in the `h` structure.
-#define tm_hash_get_ts(h, key, temp) \
-    (temp = tm_hash_index(h, key),   \
-        temp != UINT32_MAX ? (h)->values[temp] : (h)->default_value)
+#define tm_hash_get(h, key) \
+    ((h)->values ? (h)->values[tm_hash_index(h, key)] : (h)->default_value)
 
 // As [[tm_hash_get()]], but uses the explicitly passed `default_value`, instead of the default value
-// set in the hash table.
-//
-// !!! WARNING: Not thread-safe
-//     This function uses the `temp` field and thus is not safe to call simultaneously from
-//     multiple threads. In a multi-thread context, use [[tm_hash_get_default_ts()]] instead.
-#define tm_hash_get_default(h, key, default_value)    \
-    (*(uint32_t *)&(h)->temp = tm_hash_index(h, key), \
-        (h)->temp != UINT32_MAX ? (h)->values[(h)->temp] : (default_value))
-
-// A thread-safe version of [[tm_hash_get_default()]] that uses an explicitly passed temporary variable,
-// instead of the one in the `h` structure.
-#define tm_hash_get_default_ts(h, key, default_value, temp) \
-    (temp = tm_hash_index(h, key),                          \
-        temp != UINT32_MAX ? (h)->values[temp] : (default_value))
+// set in the hash table. `temp` should be an `int32_t`. It is used to cache the index lookup so it
+// doesn't have to be made twice.
+#define tm_hash_get_default(h, key, default_value, temp) \
+    ((temp = tm_hash_index(h, key)) != -1 ? (h)->values[temp] : (default_value))
 
 // Adds the pair `(key, value)` to the hash table.
-#define tm_hash_add(h, key, value)                                                                                                                                                                \
-    TM_HASH__DISABLE_WARNINGS()                                                                                                                                                                   \
-    (tm_hash__validate_key_type(h, key),                                                                                                                                                          \
-        (h)->temp = tm_hash__add((uint64_t **)&(h)->keys, &(h)->num_used, &(h)->num_buckets, *(uint64_t *)&key, (void **)&(h)->values, sizeof(*(h)->values), (h)->allocator, __FILE__, __LINE__), \
-        (h)->values[(h)->temp] = value)                                                                                                                                                           \
+#define tm_hash_add(h, key, value)                                                                                                                                                                                     \
+    TM_HASH__DISABLE_WARNINGS()                                                                                                                                                                                        \
+    (tm_hash__validate_key_type(h, key),                                                                                                                                                                               \
+        (h)->temp = tm_hash__add((uint64_t **)&(h)->keys, &(h)->num_used, &(h)->num_buckets, *(uint64_t *)&key, (void **)&(h)->values, sizeof(*(h)->values), (h)->allocator, __FILE__, __LINE__, &(h)->default_value), \
+        (h)->values[(h)->temp] = value)                                                                                                                                                                                \
         TM_HASH__RESTORE_WARNINGS()
 
 // As [[tm_hash_add()]] but returns a pointer to the value. The returned pointer is valid until the
 // hash table is modified. If the key was added to the hash table by this operation, the value is
 // set to the default value. If the key already existed, the value remains unchanged.
-#define tm_hash_add_reference(h, key)                                                                                                                                                                                                                                              \
-    TM_HASH__DISABLE_WARNINGS()                                                                                                                                                                                                                                                    \
-    (tm_hash__validate_key_type(h, key),                                                                                                                                                                                                                                           \
-        (h)->temp = tm_hash_index(h, key),                                                                                                                                                                                                                                         \
-        (h)->temp == UINT32_MAX && ((h)->temp = tm_hash__add((uint64_t **)&(h)->keys, &(h)->num_used, &(h)->num_buckets, *(uint64_t *)&key, (void **)&(h)->values, sizeof(*(h)->values), (h)->allocator, __FILE__, __LINE__), (h)->values[(h)->temp] = (h)->default_value, false), \
-        (h)->values + (h)->temp)                                                                                                                                                                                                                                                   \
+#define tm_hash_add_reference(h, key)                                                                                                                                                                                                                                                           \
+    TM_HASH__DISABLE_WARNINGS()                                                                                                                                                                                                                                                                 \
+    (tm_hash__validate_key_type(h, key),                                                                                                                                                                                                                                                        \
+        (h)->temp = tm_hash_index(h, key),                                                                                                                                                                                                                                                      \
+        (h)->temp == -1 && ((h)->temp = tm_hash__add((uint64_t **)&(h)->keys, &(h)->num_used, &(h)->num_buckets, *(uint64_t *)&key, (void **)&(h)->values, sizeof(*(h)->values), (h)->allocator, __FILE__, __LINE__, &(h)->default_value), (h)->values[(h)->temp] = (h)->default_value, false), \
+        (h)->values + (h)->temp)                                                                                                                                                                                                                                                                \
         TM_HASH__RESTORE_WARNINGS()
 
 // If `key` exists, sets the corresponding `value`, otherwise does nothing. Note that unlike
 // [[tm_hash_add()]], [[tm_hash_update()]] will never allocate memory.
 #define tm_hash_update(h, key, value)   \
     ((h)->temp = tm_hash_index(h, key), \
-        (h)->temp != UINT32_MAX ? (h)->values[(h)->temp] = value : value)
+        (h)->temp != -1 ? (h)->values[(h)->temp] = value : value)
 
 // Removes the value with the specified `key`. Removing a value never reallocates the hash table.
-#define tm_hash_remove(h, key) (                                                                                                          \
-                                   (h)->temp = tm_hash_index(h, key),                                                                     \
-                                   (h)->temp != UINT32_MAX ? ((uint64_t *)(h)->keys)[(h)->temp] = TM_HASH_TOMBSTONE : TM_HASH_TOMBSTONE), \
-                               (h)->num_used -= (h)->temp != UINT32_MAX ? 1 : 0
+#define tm_hash_remove(h, key) (                                                                                                  \
+                                   (h)->temp = tm_hash_index(h, key),                                                             \
+                                   (h)->temp != -1 ? ((uint64_t *)(h)->keys)[(h)->temp] = TM_HASH_TOMBSTONE : TM_HASH_TOMBSTONE), \
+                               (h)->num_used -= (h)->temp != -1 ? 1 : 0
 
 // Clears the hash table. This does not free any memory. The array will keep the same number of
 // buckets, but all the keys and values will be erased.
@@ -403,7 +379,7 @@ static inline uint32_t private__buckets_for_elements(uint32_t n)
 // target fillrate (currently 70 %). If the hash table already has room for `num_elements` new
 // elements, this function is a NOP.
 #define tm_hash_reserve(h, num_elements) \
-    tm_hash__grow_to((uint64_t **)&(h)->keys, &(h)->num_used, &(h)->num_buckets, (void **)&(h)->values, sizeof(*(h)->values), (h)->allocator, __FILE__, __LINE__, private__buckets_for_elements((h)->num_used + num_elements))
+    tm_hash__grow_to((uint64_t **)&(h)->keys, &(h)->num_used, &(h)->num_buckets, (void **)&(h)->values, sizeof(*(h)->values), (h)->allocator, __FILE__, __LINE__, private__buckets_for_elements((h)->num_used + num_elements), &(h)->default_value)
 
 // Set
 //
@@ -417,13 +393,13 @@ static inline uint32_t private__buckets_for_elements(uint32_t n)
     {                                     \
         uint32_t num_buckets;             \
         uint32_t num_used;                \
-        uint32_t temp;                    \
+        int32_t temp;                     \
         uint32_t padding;                 \
         K *keys;                          \
         struct tm_allocator_i *allocator; \
     }
 
-// Returns the index in the set where the `key` is stored, or `UINT32_MAX` if `key` is not in the
+// Returns the index in the set where the `key` is stored, or `-1` if `key` is not in the
 // set.
 #define tm_set_index(h, key) tm_set_index(h, key)
 
@@ -434,7 +410,7 @@ static inline uint32_t private__buckets_for_elements(uint32_t n)
 #define tm_set_count(h) tm_hash_count(h)
 
 // Adds the `key` to the set. Note that this might reallocate the set.
-#define tm_set_add(h, key) (tm_hash__add((uint64_t **)&(h)->keys, &(h)->num_used, &(h)->num_buckets, *(uint64_t *)&key, NULL, 0, (h)->allocator, __FILE__, __LINE__)[(h)->keys] = key)
+#define tm_set_add(h, key) (tm_hash__add((uint64_t **)&(h)->keys, &(h)->num_used, &(h)->num_buckets, *(uint64_t *)&key, NULL, 0, (h)->allocator, __FILE__, __LINE__, NULL)[(h)->keys] = key, 0)
 
 // Removes the value with the specified `key`. Removing a value never reallocates set.
 #define tm_set_remove(h, key) tm_hash_remove(h, key)
@@ -453,7 +429,13 @@ static inline uint32_t private__buckets_for_elements(uint32_t n)
 
 // Reserves space in the set for `num_elements` new elements.
 #define tm_set_reserve(h, num_elements) \
-    tm_hash__grow_to((uint64_t **)&(h)->keys, &(h)->num_used, &(h)->num_buckets, 0, 0, (h)->allocator, __FILE__, __LINE__, private__buckets_for_elements((h)->num_used + num_elements))
+    tm_hash__grow_to((uint64_t **)&(h)->keys, &(h)->num_used, &(h)->num_buckets, 0, 0, (h)->allocator, __FILE__, __LINE__, private__buckets_for_elements((h)->num_used + num_elements), NULL)
+
+// Identical to [[tm_hash_skip_key()]].
+#define tm_set_skip_key(s, keyptr) tm_hash_skip_key(s, keyptr)
+
+// Identical to [[tm_hash_use_key()]].
+#define tm_set_use_key(s, keyptr) tm_hash_use_key(s, keyptr)
 
 // Identical to [[tm_hash_skip_index()]].
 #define tm_set_skip_index(s, index) tm_hash_skip_index(s, index)
@@ -496,10 +478,6 @@ typedef struct tm_set_strhash_t TM_SET_T(tm_strhash_t) tm_set_strhash_t;
 
 #define tm_hash_get_rv(h, key) tm_hash_get(h, (uint64_t){ key })
 
-#define tm_hash_get_default_rv(h, key, default_value) tm_hash_get_default(h, (uint64_t){ key }, default_value)
-
-#define tm_hash_get_rv_ts(h, key, temp) tm_hash_get_ts(h, (uint64_t){ key }, temp)
-
 #define tm_hash_add_rv(h, key, value) tm_hash_add(h, (uint64_t){ key }, value)
 
 #define tm_hash_add_reference_rv(h, key) tm_hash_add_reference(h, (uint64_t){ key })
@@ -538,7 +516,7 @@ static inline void tm_hash__free(uint64_t **keys_ptr, uint32_t *num_used_ptr, ui
 {
     uint64_t *keys = *keys_ptr;
     const uint32_t num_buckets = *num_buckets_ptr;
-    const uint64_t bytes_to_free = num_buckets ? num_buckets * (sizeof(*keys) + value_bytes) : 0;
+    const uint64_t bytes_to_free = num_buckets ? num_buckets * (sizeof(*keys) + value_bytes) + value_bytes : 0;
     if (allocator)
         allocator->realloc(allocator, keys, bytes_to_free, 0, file, line);
     *keys_ptr = 0;
@@ -548,11 +526,11 @@ static inline void tm_hash__free(uint64_t **keys_ptr, uint32_t *num_used_ptr, ui
     *num_buckets_ptr = 0;
 }
 
-// Returns the index of the `key` in the array `keys` or `UINT32_MAX` if `key` is not in the array.
-static inline uint32_t tm_hash__index(const uint64_t *keys, uint32_t num_buckets, uint64_t key)
+// Returns the index of the `key` in the array `keys` or `-1` if `key` is not in the array.
+static inline int32_t tm_hash__index(const uint64_t *keys, uint32_t num_buckets, uint64_t key)
 {
     if (!num_buckets || key >= TM_HASH_TOMBSTONE)
-        return UINT32_MAX;
+        return -1;
 
     const uint32_t max_distance = num_buckets;
 
@@ -560,9 +538,9 @@ static inline uint32_t tm_hash__index(const uint64_t *keys, uint32_t num_buckets
     uint32_t distance = 0;
     while (keys[i] != key) {
         if (distance > max_distance)
-            return UINT32_MAX;
+            return -1;
         if (keys[i] == TM_HASH_UNUSED)
-            return UINT32_MAX;
+            return -1;
         i = (i + 1) & (num_buckets - 1);
         ++distance;
     }
@@ -570,44 +548,44 @@ static inline uint32_t tm_hash__index(const uint64_t *keys, uint32_t num_buckets
 }
 
 // Tries to add `key` to the `keys` array (without reallocating it). If it succeeds, it will return
-// the index of the added key and otherwise `UINT32_MAX`. You should only call this if
+// the index of the added key and otherwise `-1`. You should only call this if
 // [[tm_hash_index()]] has failed to find the key.
-static inline uint32_t tm_hash__add_no_grow(const uint64_t *keys, uint32_t num_buckets, uint64_t key)
+static inline int32_t tm_hash__add_no_grow(const uint64_t *keys, uint32_t num_buckets, uint64_t key)
 {
     const uint32_t max_distance = num_buckets;
 
     if (!num_buckets)
-        return UINT32_MAX;
+        return -1;
 
     uint32_t i = tm_hash__first_index(key, num_buckets);
     uint32_t distance = 0;
     while (keys[i] != TM_HASH_UNUSED && keys[i] != TM_HASH_TOMBSTONE) {
         if (distance > max_distance)
-            return UINT32_MAX;
+            return -1;
         i = (i + 1) & (num_buckets - 1);
         ++distance;
     }
     return i;
 }
 
-static inline void tm_hash__grow(uint64_t **keys_ptr, uint32_t *num_used_ptr, uint32_t *num_buckets_ptr, void **values_ptr, uint64_t value_bytes, tm_allocator_i *allocator, const char *file, uint32_t line);
+static inline void tm_hash__grow(uint64_t **keys_ptr, uint32_t *num_used_ptr, uint32_t *num_buckets_ptr, void **values_ptr, uint64_t value_bytes, tm_allocator_i *allocator, const char *file, uint32_t line, const void *default_value);
 
 // Adds `key` to the hash table, growing it as necessary, and returns its index. If the hash table
 // needs to grow and `allocator` is NULL, an error will be generated.
-static inline uint32_t tm_hash__add(uint64_t **keys_ptr, uint32_t *num_used_ptr, uint32_t *num_buckets_ptr, uint64_t key, void **values_ptr, uint64_t value_bytes, tm_allocator_i *allocator, const char *file, uint32_t line)
+static inline int32_t tm_hash__add(uint64_t **keys_ptr, uint32_t *num_used_ptr, uint32_t *num_buckets_ptr, uint64_t key, void **values_ptr, uint64_t value_bytes, tm_allocator_i *allocator, const char *file, uint32_t line, const void *default_value)
 {
-    uint32_t i = tm_hash__index(*keys_ptr, *num_buckets_ptr, key);
-    if (i != UINT32_MAX)
+    int32_t i = tm_hash__index(*keys_ptr, *num_buckets_ptr, key);
+    if (i != -1)
         return i;
 
     if ((!*num_buckets_ptr || (float)*num_used_ptr / (float)*num_buckets_ptr > 0.7f) && allocator)
-        tm_hash__grow(keys_ptr, num_used_ptr, num_buckets_ptr, values_ptr, value_bytes, allocator, file, line);
+        tm_hash__grow(keys_ptr, num_used_ptr, num_buckets_ptr, values_ptr, value_bytes, allocator, file, line, default_value);
 
     if (!TM_ASSERT(key != TM_HASH_UNUSED && key != TM_HASH_TOMBSTONE, tm_error_api->def, "Tombstone cannot be used as key"))
         return 0;
 
     i = tm_hash__add_no_grow(*keys_ptr, *num_buckets_ptr, key);
-    if (!TM_ASSERT(i != UINT32_MAX, tm_error_api->def, "%s", values_ptr ? "Static hash full" : "Static set full"))
+    if (!TM_ASSERT(i != -1, tm_error_api->def, "%s", values_ptr ? "Static hash full" : "Static set full"))
         return 0;
 
     uint64_t *keys = *keys_ptr;
@@ -617,7 +595,7 @@ static inline uint32_t tm_hash__add(uint64_t **keys_ptr, uint32_t *num_used_ptr,
 }
 
 // Grows the hash table to the specified size
-static inline void tm_hash__grow_to(uint64_t **keys_ptr, uint32_t *num_used_ptr, uint32_t *num_buckets_ptr, void **values_ptr, uint64_t value_bytes, tm_allocator_i *allocator, const char *file, uint32_t line, uint32_t new_buckets)
+static inline void tm_hash__grow_to(uint64_t **keys_ptr, uint32_t *num_used_ptr, uint32_t *num_buckets_ptr, void **values_ptr, uint64_t value_bytes, tm_allocator_i *allocator, const char *file, uint32_t line, uint32_t new_buckets, const void *default_value)
 {
     const uint64_t *keys = *keys_ptr;
     const uint32_t num_buckets = *num_buckets_ptr;
@@ -626,9 +604,12 @@ static inline void tm_hash__grow_to(uint64_t **keys_ptr, uint32_t *num_used_ptr,
     if (num_buckets >= new_buckets)
         return;
 
-    const uint64_t to_alloc = new_buckets * (sizeof(*keys) + value_bytes);
+    const uint64_t to_alloc = new_buckets * (sizeof(*keys) + value_bytes) + value_bytes;
     uint64_t *new_keys = (uint64_t *)allocator->realloc(allocator, 0, 0, to_alloc, file, line);
-    void *new_values = new_keys + new_buckets;
+    void *default_value_ptr = new_keys + new_buckets;
+    if (value_bytes)
+        memcpy(default_value_ptr, default_value, value_bytes);
+    void *new_values = (char *)default_value_ptr + value_bytes;
     memset(new_keys, 0xff, new_buckets * sizeof(uint64_t));
     uint32_t new_elements = 0;
 
@@ -650,7 +631,7 @@ static inline void tm_hash__grow_to(uint64_t **keys_ptr, uint32_t *num_used_ptr,
 }
 
 // Grows the hash table.
-static inline void tm_hash__grow(uint64_t **keys_ptr, uint32_t *num_used_ptr, uint32_t *num_buckets_ptr, void **values_ptr, uint64_t value_bytes, tm_allocator_i *allocator, const char *file, uint32_t line)
+static inline void tm_hash__grow(uint64_t **keys_ptr, uint32_t *num_used_ptr, uint32_t *num_buckets_ptr, void **values_ptr, uint64_t value_bytes, tm_allocator_i *allocator, const char *file, uint32_t line, const void *default_value)
 {
     const uint32_t num_used = *num_used_ptr;
     const uint32_t num_buckets = *num_buckets_ptr;
@@ -659,7 +640,7 @@ static inline void tm_hash__grow(uint64_t **keys_ptr, uint32_t *num_used_ptr, ui
     while ((float)num_used / new_buckets > 0.5f)
         new_buckets *= 2;
 
-    tm_hash__grow_to(keys_ptr, num_used_ptr, num_buckets_ptr, values_ptr, value_bytes, allocator, file, line, new_buckets);
+    tm_hash__grow_to(keys_ptr, num_used_ptr, num_buckets_ptr, values_ptr, value_bytes, allocator, file, line, new_buckets, default_value);
 }
 
 // Copies the keys and values arrays to new pointers.
@@ -667,11 +648,14 @@ static inline void tm_hash__copy(uint64_t **keys_ptr, uint32_t num_buckets, void
     uint64_t value_bytes, tm_allocator_i *allocator, const char *file, uint32_t line)
 {
     uint64_t *old_keys = *keys_ptr;
-    const uint64_t size = num_buckets * (sizeof(old_keys) + value_bytes);
+    const uint64_t size = num_buckets ? num_buckets * (sizeof(old_keys) + value_bytes) + value_bytes : 0;
     *keys_ptr = (uint64_t *)allocator->realloc(allocator, 0, 0, size, file, line);
 
-    if (values_ptr)
-        *values_ptr = (*keys_ptr) + num_buckets;
+    if (values_ptr && *values_ptr) {
+        void *default_value_ptr = (*keys_ptr) + num_buckets;
+        void *values = (char *)default_value_ptr + value_bytes;
+        *values_ptr = values;
+    }
 
     memcpy(*keys_ptr, old_keys, size);
 }

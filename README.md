@@ -17,7 +17,13 @@ Tested: With vcc and tcc on Windows, and The Machinery master branch.
 - Prereqs
   - Copy `tcc\intrin.h` to your tcc include folder for win32. It's used by `math.inl`.
   - `nim r remove_pragma_once.nim` script modifies the headers to work with tcc.  tcc doesn't support the non-standard `#pragma once`. 
-  - `foundation/api_types.h` is modified to check for `TCC` so it defines `TM_DISABLE_PADDING_WARNINGS` and `TM_RESTORE_PADDING_WARNINGS` with nothing. They're used in `math.inl`.
+  - `foundation/api_types.h` needs modification to check for `TCC` so it defines `TM_DISABLE_PADDING_WARNINGS` and `TM_RESTORE_PADDING_WARNINGS` as nothing. Inside of the `if defined(TM_OS_WINDOWS)` check add ```
+#if defined(TCC)
+#define TM_DISABLE_PADDING_WARNINGS
+#define TM_RESTORE_PADDING_WARNINGS
+#else
+``` and  and `#endif` after the define for `TM_RESTORE_PADDING_WARNINGS`.
+
 - Modify tm.nimble to set the compiler to `tcc`
 - Run `nimble gen` again to regenerate `tm/tm_generated.nim`, then build your plugin
 
@@ -26,6 +32,7 @@ Tested: With vcc and tcc on Windows, and The Machinery master branch.
 - Run `nimble gen`
   - If you get an `Error: undeclared identifier ...` about an opaque type, ending in `_o`, override it in `tm_gen_override.nim`, and run `nimble gen` again.
   - Union: Create a new type with all the fields (flattened). With `importc` Nim will import them correctly.
+  - On Identifier 'Foo' is a stylistic duplicate of identifier 'foo', 'use cPlugin:onSymbol()', modify `tm_gen_onsymbol.nim` to rename the identifier.
 
 ## Proc Type issues ##
 The Machinery uses lots of function pointers and callbacks. There's a custom pragma `tmType` you can attach to a proc to make it easier to interact with the api. Without it you need to cast the proc.
