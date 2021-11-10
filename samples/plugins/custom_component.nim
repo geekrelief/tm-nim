@@ -39,8 +39,7 @@ proc truthCreateTypes(tt: ptr tmTheTruthO) {.cdecl, tmType: tmTheTruthCreateType
 
   let 
     customComponentType = truthApi.createObjectType(tt, TtTypeCustomComponent, customComponentProperties[0].unsafeAddr, customComponentProperties.len.uint32)
-    defaultObject = truthApi.quickCreateObject(tt, TmTtNoUndoScope, TtTypeHashCustomComponent,
-      Frequency, 2.0, Amplitude, 1.0, -1)
+    defaultObject = truthApi.quickCreateObject(tt, TmTtNoUndoScope, TtTypeHashCustomComponent, Frequency, 2.0, Amplitude, 1.0, -1)
   truthApi.set_default_object(tt, customComponentType, defaultObject)
   truthApi.set_aspect(tt, customComponentType, TmCiEditorUi, editor_aspect.unsafeAddr)
 
@@ -59,7 +58,7 @@ proc componentLoadAsset(manager: ptr tmComponentManagerO, commands: ptr tmEntity
   let pos = truthCommonTypesApi.get_position(tt, truthApi.read(tt, trAsset), TM_TT_PROP_TRANSFORM_COMPONENT_LOCAL_POSITION.uint32)
   ]#
 
-  let y = truthApi.quick_get_property(tt, ownerAsset, TM_TT_PROP_ENTITY_COMPONENTS.uint32, 0, TM_TT_PROP_TRANSFORM_COMPONENT_LOCAL_POSITION.uint32, 1, -1).f32
+  let y = truthApi.quick_get_property(tt, ownerAsset, TM_TT_PROP_ENTITY_COMPONENTS, 0, TM_TT_PROP_TRANSFORM_COMPONENT_LOCAL_POSITION, 1, -1).f32
   c.y0 = y
   
   c.frequency = truthApi.getFloat(tt, compAssetR, Frequency.uint32)

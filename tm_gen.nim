@@ -37,7 +37,7 @@ when defined(vcc) or defined(tcc):
 when defined(tcc):
   cDefine("TCC")
 
-cImport( flags = "-c -E_ -F_ -G__=_", recurse = true,
+cImport( flags = "--enumNotDistinct --enumUnsigned -c -E_ -F_ -G__=_", recurse = true,
   nimFile = "tm/tm_generated.nim", 
   filenames = static(getHeaders(tm_headers_dir))
 )

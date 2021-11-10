@@ -45,7 +45,7 @@ proc getPragmaVal*(n: NimNode, cpName: string):NimNode =
 # used to map nim procs to TM function typedef (which is not a function pointer!)
 template tmType*(T: typedesc) {.pragma.}
 
-func toArray*[T](n: static int, a: varargs[T]): array[n, T] =
+func toArray*[T](n: static uint, a: varargs[T]): array[n, T] =
   for i, x in a:
     result[i] = x
 

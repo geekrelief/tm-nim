@@ -20,6 +20,9 @@ const tm_plugins_dir = "C:/tm/gr-tm/bin/Debug/plugins/"
 
 const dev = false # bindings development flag
 
+when not defined(dev):
+  requires "https://github.com/geekrelief/nimterop >= 0.8.4"
+
 import globals
 import strformat, strutils
 import os
@@ -33,7 +36,10 @@ proc taskParams(): seq[string] = # nimble's paramCount / paramStr is broken in v
   
 
 task gen, "Generate the binding":
-  exec &"nim c --cc:{cc} tm_gen.nim"
+  if dev:
+    exec &"nim c -d:dev --cc:{cc} tm_gen.nim"
+  else:
+    exec &"nim c --cc:{cc} tm_gen.nim"
 
 proc commonFlags(): seq[string] =
   var flags = @[&"--cc:{cc}"]
