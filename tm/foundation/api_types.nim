@@ -54,9 +54,7 @@ type
   tm_version_t* {.struct, impapi_typesHdr, importc:"struct tm_version_t".} = object
     major*, minor*, patch*: uint32 
 
-  tm_strhash_t* {.importc.} = distinct uint64
-
-proc `==`*(a, b: tm_strhash_t): bool {.borrow.}
+  tm_strhash_t* {.importc.} = uint64
 
 proc tt_id*(`type`, generation, index: uint64): tm_tt_id_t {.inline.} = 
   result.`type` = `type`
@@ -69,6 +67,9 @@ converter to_tt_type*(id: tm_tt_id_t): tm_tt_type_t {.inline.} =
 proc TM_VERSION*(major, minor, patch: uint32): tm_version_t {.inline.} =
   tm_version_t(major: major, minor: minor, patch: patch)
 
+proc TM_VERSION_INITIALIZER*(major, minor, patch: uint32): tm_version_t {.inline.} =
+  tm_version_t(major: major, minor: minor, patch: patch)
+
 macro TM_STATIC_HASH*(x: static string, h: uint64 = 0): tm_strhash_t =
   var hashLit = 
     if h.intVal == 0: 
@@ -77,16 +78,14 @@ macro TM_STATIC_HASH*(x: static string, h: uint64 = 0): tm_strhash_t =
       h
   result = newTree(nnkCast, ident("tm_strhash_t"), hashLit)
 
-const TM_PAGE_SIZE* = 4096
-
 #== helpers ==
-proc vec2*(x, y: float = 0.0): tm_vec2_t {.inline.} =
+proc vec2*(x, y: float = 0f): tm_vec2_t {.inline.} =
   tm_vec2_t(x: x, y: y)
 
-proc vec3*(x, y, z: float = 0.0): tm_vec3_t {.inline.} =
+proc vec3*(x, y, z: float = 0f): tm_vec3_t {.inline.} =
   tm_vec3_t(x: x, y: y, z: z)
 
-proc vec4*(x, y, z, w: float = 0.0): tm_vec4_t {.inline.} =
+proc vec4*(x, y, z, w: float = 0f): tm_vec4_t {.inline.} =
   tm_vec4_t(x: x, y: y, z: z, w: w)
 
 proc mat44*(xx, xy, xz, xw,
@@ -98,6 +97,15 @@ proc mat44*(xx, xy, xz, xw,
     yx: yx, yy: yy, yz: yz, yw: yw,
     zx: zx, zy: zy, zz: zz, zw: zw,
     wx: wx, wy: wy, wz: xw, ww: ww)
+
+proc transform*(pos: tm_vec3_t = vec3(), rot: tm_vec4_t = vec4(w = 1f), scl: tm_vec3_t = vec3(1f, 1f, 1f)): tm_transform_t {.inline.} =
+  tm_transform_t(pos: pos, rot: rot, scl: scl)
+
+proc rect*(x, y, w, h: float = 0f): tm_rect_t {.inline.} =
+    tm_rect_t(x:x, y: y, w: w, h: h)
+
+proc color*(r, g, b, a: uint8 = 0): tm_color_srgb_t {.inline.} =
+  tm_color_srgb_t(r: r, g: g, b: b, a: a)
 
 converter toStr*(s: string): tm_str_t {.inline.} =
   tm_str_t(data: s, size: (uint32)s.len, null_terminated: 1)

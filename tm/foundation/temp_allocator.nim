@@ -1,13 +1,13 @@
 type TempAllocator* = object
-  api*: ptr tmTempAllocatorApi
-  o*: tmTempAllocator1024O
-  p*: ptr tmTempAllocatorI
+  api*: ptr tm_temp_allocator_api
+  o*: tm_temp_allocator_1024_o
+  p*: ptr tm_temp_allocator_i
 
 proc `=destroy`*(a: var TempAllocator) =
   if a.p != nil:
     a.api.destroy(a.p)
 
-template init*(a: ptr tmTempAllocatorApi): ptr tmTempAllocatorI =
+template init*(a: ptr tm_temp_allocator_api): ptr tm_temp_allocator_i =
   var ta = TempAllocator(api: a)
   ta.p = a.createInBuffer(cast[ptr cchar](ta.o.buffer[0].addr), sizeof(ta.o.buffer).uint64, nil)
   ta.p

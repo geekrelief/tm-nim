@@ -89,12 +89,12 @@ graph: {
 				__prototype_type: "tm_graph_cached_node_result"
 				__prototype_uuid: "e104c843-70a9-86c9-5e7f-a63212c7a8fa"
 				node: "49cbc4af-8314-05fa-fabc-00884be0de7a"
-				validity_hash: "928c62d5c5253ffc"
+				validity_hash: "c23d29ebf93b503f"
 				object: {
 					__type: "tm_shader_system_compiled_result"
-					__uuid: "c0ee0b51-57ae-f142-d3a7-11b273a6531a"
-					name: "928c62d5c5253ffc"
-					buffer: "bbd2f86c02c5f6cd"
+					__uuid: "4732efe9-f29f-74af-9f2a-98a28090125f"
+					name: "c23d29ebf93b503f"
+					buffer: "270baa115372b912"
 				}
 			}
 		]

@@ -4,6 +4,7 @@
 #include "api_types.h"
 
 struct tm_allocator_i;
+struct tm_temp_allocator_o;
 
 // Provides a system for temporary memory allocations. I.e., short-lived memory allocations that are
 // automatically freed when the allocator is destroyed. Temp allocators typically use a pointer bump

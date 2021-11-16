@@ -7,3 +7,5 @@
 *.pdb
 build
 tm_generated.nim
+tm_header_deps.txt
+.vscode

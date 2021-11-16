@@ -83,6 +83,11 @@ components: [
 	{
 		__type: "tm_camera_component"
 		__uuid: "829cceef-3ec8-bd01-708b-b546eacfada7"
+		sensor_size: {
+			__uuid: "1e9b2eac-3396-df69-63eb-27b7cc92bb70"
+			x: 36
+			y: 24
+		}
 	}
 ]
 __asset_uuid: "57ccfbc3-7837-0866-82d1-3ca92770eb9a"

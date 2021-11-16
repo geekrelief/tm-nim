@@ -1,32 +1,52 @@
+## Tips for overriding
+## ===================
+##
+## Invalid Pragma Error
+## --------------------
+## In tm_gen.nim, cImport uses `recurse = true`, this preprocesses the headers,
+## flattening them, so we lose track of which file a type actually comes from.
+## For example, if `a.h` includes `b.h` and `b.h` defines `foo`, when nimterop
+## creates the header pragma `foo` will be marked as coming from `a.h` like `impaHdr`.
+## If you override something, and reuse a nimterop custom `header` pragma you might
+## run into an `invalid pragma` error.  Replace the nimterop custom `header` pragma,
+## with a regular `header` pragma that points to the file where the definition exists.
+
+## Opaque data: pointers ot `_o` or `_t` types.
+## -----------
+## TM uses a lot of opaque ptrs, typedefs with _o suffix, and other types that are passed
+## between API calls. If all we have to do is pass these along between calls we can define
+## an empty `object` for them.
+## If TM, expects us to define our own data through an opaque type, we can override their
+## definition using inheritance via `{.inheritable.}`.
+## This makes it possible to create subtypes for opaque types to interop between Nim and C.
+
+## Unions
+## ------
+## To handle unions, flatten the structure/union by bringing all the fields into the object.
+## Rely on importc to handle all the fields correctly.
+
+## TM_INHERITS
+## -----------
+## TM defines some `struct` types with another `struct` declaration at the top using TM_INHERITS.
+## The workaround is to copy all fields from the referenced `struct` into the current `struct`.
+
 cOverride:
-
-  ## Tips for overriding
-
-  ## Opaque ptr (_o): TM uses a lot of opaque ptrs, typedefs with _o suffix.
-  ## Overriding their definition using inheritance via {.inheritable.}
-  ## makes it easy to create multiple definitions in Nim to interop with C.
-  ## So we can have one, tm_generated.nim, for multiple plugins.
-
-  ## Unions: To handle unions, flatten the structure/union by bringing all
-  ## the fields into the object.
-  ## Rely on importc to handle all the fields correctly.
-
-  ## TM_INHERITS: Copy all fields from super struct into sub struct.
 
   type
     tm_simulation_state_o* {.inheritable.} = object
-    tm_component_manager_o* {.inheritable.} = object # entity.h
-    tm_plugin_o* = object
-    tm_temp_allocator_o* = object
+    tm_component_manager_o* {.inheritable.} = object
 
     #>foundation/the_truth.h
-    tm_the_truth_property_definition_t* {.bycopy, union, impthe_truthHdr, importc: "struct tm_the_truth_property_definition_t".} = object
+    # check if we need to override for union if union is well behaved with importc
+    tm_the_truth_property_definition_t* {.bycopy, union, header:tm_headers_dir & "foundation/the_truth.h", importc: "struct tm_the_truth_property_definition_t".} = object
       name*: cstring
       `type`*: tm_the_truth_property_type
       editor*: uint32
+      #>union
       enum_editor*: tm_the_truth_editor_enum_t
       string_open_path_editor*: tm_the_truth_editor_string_open_path_t
       string_save_path_editor*: tm_the_truth_editor_string_save_path_t
+      #<union
       type_hash*: tm_strhash_t
       allow_other_types*: bool
       padding_451*: array[7, cchar]
@@ -38,7 +58,16 @@ cOverride:
       ui_name*: cstring
     #<foundation/the_truth.h
 
-    tm_streamable_buffers_i* {.bycopy, impbufferHdr, importc: "struct tm_streamable_buffers_i".} = object
+    #[
+    #>foundation/input.h
+    tm_input_data_t* {.bycopy, union, impinputHdr, importc: "struct tm_input_data_t".} = object
+      f*: tm_vec4_t
+      codepoint*: uint32
+    #<foundation/input.h
+    ]#
+
+    #>foundation/buffer.h
+    tm_streamable_buffers_i* {.bycopy, header: tm_headers_dir & "foundation/buffer.h", importc: "struct tm_streamable_buffers_i".} = object
       #>inherit tm_buffers_i
       inst*: ptr tm_buffers_o
       allocate*: proc (inst: ptr tm_buffers_o; size: uint64; initialize: pointer): pointer {.cdecl.}
@@ -64,7 +93,8 @@ cOverride:
     #<foundation/buffer.h
     
     #>foundation/temp_allocator.h
-    tm_temp_allocator_api* {.bycopy, impcarrayHdr, importc: "struct tm_temp_allocator_api".} = object
+    #tm_temp_allocator_api* {.bycopy, impcarrayHdr, importc: "struct tm_temp_allocator_api".} = object
+    tm_temp_allocator_api* {.bycopy, header: tm_headers_dir & "foundation/api_types.h" ,importc: "struct tm_temp_allocator_api".} = object
       create*: proc (backing: ptr tm_allocator_i): ptr tm_temp_allocator_i {.cdecl.}
       # create_in_buffer (buffer: cstring)
       create_in_buffer*: proc (buffer: ptr cchar; size: uint64; backing: ptr tm_allocator_i): ptr tm_temp_allocator_i {.cdecl.}
@@ -80,9 +110,8 @@ cOverride:
       statistics*: ptr tm_temp_allocator_statistics_t
     #<foundation/temp_allocator.h
 
-    #>plugin/entity.h
-
-    tm_entity_system_i* {.bycopy, impentityHdr, importc: "struct tm_entity_system_i".} = object
+    #>plugin/entity/entity.h
+    tm_entity_system_i* {.bycopy, header:tm_headers_dir & "plugins/entity/entity.h", importc: "struct tm_entity_system_i".} = object
       #>inherit tm_engine_system_common_i
       ui_name*: cstring
       hash*: tm_strhash_t
@@ -105,7 +134,7 @@ cOverride:
       shutdown*: proc (ctx: ptr tm_entity_context_o; inst: ptr tm_entity_system_o; commands: ptr tm_entity_commands_o) {.cdecl.}
       hot_reload*: proc (ctx: ptr tm_entity_context_o; inst: ptr tm_entity_system_o; commands: ptr tm_entity_commands_o) {.cdecl.}
 
-    tm_engine_i* {.impentityHdr, importc: "struct tm_engine_i".} = object
+    tm_engine_i* {.header:tm_headers_dir & "plugins/entity/entity.h", importc: "struct tm_engine_i".} = object
       #>inherit tm_engine_system_common_i
       ui_name*: cstring
       hash*: tm_strhash_t
@@ -126,6 +155,50 @@ cOverride:
       padding_504*: array[4, cchar]
       excluded*: array[32, tm_component_type_t]
       filter*: proc (inst: ptr tm_engine_o; components: ptr tm_component_type_t; num_components: uint32; mask: ptr tm_component_mask_t): bool {.cdecl.}
+    #<plugin/entity/entity.h
 
-    #<plugin/entity.h
+    #>plugin/renderer/resources.h
+
+    tm_renderer_clear_value_t_color* {.union, bycopy, impresourcesHdr,
+                                      importc: "struct color".} = object
+      float32*: array[4, cfloat]
+      int32*: array[4, int32]
+      uint32*: array[4, uint32]
+    #[
+    tm_renderer_clear_value_t
+    typedef union tm_renderer_clear_value_t
+    {
+        struct color
+        {
+            union
+            {
+                float float32[4];
+                int32_t int32[4];
+                uint32_t uint32[4];
+            };
+        } color;
+        struct depth_stencil
+        {
+            float depth;
+            uint32_t stencil;
+        } depth_stencil;
+    } tm_renderer_clear_value_t;
+    ]#
+
+    #[
+    tm_renderer_clear_value_color* {.union, bycopy.} = object
+      float32*: array[4, cfloat]
+      int32*: array[4, int32]
+      uint32*: array[4, uint32]
+
+    tm_renderer_clear_value_depth_stencil* {.bycopy.} = object
+      depth*: cfloat
+      stencil*: uint32
+
+    tm_renderer_clear_value_t* {.union, bycopy, impresourcesHdr, importc: "union tm_renderer_clear_value_t".} = object
+      color*: tm_renderer_clear_value_color
+      depth_stencil*: tm_renderer_clear_value_depth_stencil
+      ]#
+    #<plugin/renderer/resources.h
+
   #<type

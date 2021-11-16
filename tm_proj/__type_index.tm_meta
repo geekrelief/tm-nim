@@ -330,9 +330,108 @@
 		name: "tm_animation_curve"
 		properties: [
 			{
+				name: "ref_asset"
+				type: "reference"
+				type_hash: "ff156da2e01c4a3d"
+			}
+			{
+				name: "duration"
+				type: "float"
+			}
+			{
+				name: "entities"
+				type: "subobject_set"
+				type_hash: "209bbe5b024cb8ef"
+			}
+		]
+		default: {
+			duration: 8.333333015441895
+			entities: [
+				{
+					name: "."
+					curves: [
+						{
+							name: "transform.local.pos"
+							type: 2
+							x: {
+								keys: [
+									{
+										value: 1
+									}
+									{
+										time: 1
+										value: 1
+									}
+								]
+							}
+							y: {
+								keys: [
+									{
+										value: 0.5
+									}
+									{
+										time: 1
+										value: 0.699999988079071
+									}
+								]
+							}
+							z: {
+								keys: [
+									{
+									}
+									{
+										time: 1
+										value: 0.2000000029802322
+									}
+								]
+							}
+							w: {
+							}
+						}
+					]
+				}
+			]
+		}
+	}
+	{
+		name: "tm_animation_curve_asset_reference"
+		properties: [
+			{
+				name: "curve"
+				type: "reference"
+				type_hash: "aed8751afe4e2988"
+			}
+		]
+	}
+	{
+		name: "tm_animation_curve_component"
+		properties: [
+			{
+				name: "extrapolate_left"
+				type: "uint32_t"
+			}
+			{
+				name: "extrapolate_right"
+				type: "uint32_t"
+			}
+			{
 				name: "keys"
 				type: "subobject_set"
 				type_hash: "8a21801392ab2f09"
+			}
+		]
+	}
+	{
+		name: "tm_animation_curve_entity"
+		properties: [
+			{
+				name: "name"
+				type: "string"
+			}
+			{
+				name: "curves"
+				type: "subobject_set"
+				type_hash: "3c729fa9233c92f3"
 			}
 		]
 	}
@@ -347,7 +446,62 @@
 				name: "value"
 				type: "float"
 			}
+			{
+				name: "tangent_type"
+				type: "uint32_t"
+			}
+			{
+				name: "tangent_in"
+				type: "float"
+			}
+			{
+				name: "tangent_out"
+				type: "float"
+			}
 		]
+	}
+	{
+		name: "tm_animation_curve_property"
+		properties: [
+			{
+				name: "name"
+				type: "string"
+			}
+			{
+				name: "type"
+				type: "uint32_t"
+			}
+			{
+				name: "x"
+				type: "subobject"
+				type_hash: "f915c3fac2cd27e9"
+			}
+			{
+				name: "y"
+				type: "subobject"
+				type_hash: "f915c3fac2cd27e9"
+			}
+			{
+				name: "z"
+				type: "subobject"
+				type_hash: "f915c3fac2cd27e9"
+			}
+			{
+				name: "w"
+				type: "subobject"
+				type_hash: "f915c3fac2cd27e9"
+			}
+		]
+		default: {
+			x: {
+			}
+			y: {
+			}
+			z: {
+			}
+			w: {
+			}
+		}
 	}
 	{
 		name: "tm_animation_curve_set"
@@ -367,11 +521,6 @@
 							name: "world.local.pos"
 							type: 2
 							x: {
-								keys: [
-									{
-										value: 1
-									}
-								]
 							}
 							y: {
 							}
@@ -506,12 +655,45 @@
 		]
 	}
 	{
+		name: "tm_application_security"
+		properties: [
+			{
+				name: "always_allow_dll_project_paths"
+				type: "subobject_set"
+				type_hash: "a84ae1fca1a3e0cb"
+			}
+			{
+				name: "always_deny_dll_project_paths"
+				type: "subobject_set"
+				type_hash: "a84ae1fca1a3e0cb"
+			}
+		]
+	}
+	{
 		name: "tm_application_settings"
 		properties: [
+			{
+				name: "analytics_client_id"
+				type: "string"
+			}
+			{
+				name: "analytics_opt_out"
+				type: "bool"
+			}
 			{
 				name: "default_camera"
 				type: "subobject"
 				type_hash: "41418a36f804f101"
+			}
+			{
+				name: "network_settings"
+				type: "subobject"
+				type_hash: "395cfd1a7615a887"
+			}
+			{
+				name: "grid_settings"
+				type: "subobject"
+				type_hash: "8547d86433b5494c"
 			}
 			{
 				name: "window_layouts"
@@ -523,7 +705,91 @@
 				type: "subobject_set"
 				type_hash: "ba4e5d5c28639596"
 			}
+			{
+				name: "interface_settings"
+				type: "subobject"
+				type_hash: "d2e5a5bb1c32c070"
+			}
+			{
+				name: "localization_settings"
+				type: "subobject"
+				type_hash: "a9afaf1feec8f7aa"
+			}
+			{
+				name: "keyboard_shortcuts"
+				type: "subobject"
+				type_hash: "7d4a95b2fa144d88"
+			}
+			{
+				name: "ui_themes"
+				type: "subobject_set"
+				type_hash: "2068b64b38668594"
+			}
+			{
+				name: "ui_theme"
+				type: "reference"
+				type_hash: "2068b64b38668594"
+			}
+			{
+				name: "builtin_ui_theme"
+				type: "uint32_t"
+			}
+			{
+				name: "workspaces_bar_mode"
+				type: "uint32_t"
+			}
+			{
+				name: "projects_settings"
+				type: "subobject_set"
+				type_hash: "e1defaa0c3c62d2d"
+			}
+			{
+				name: "updates"
+				type: "subobject"
+				type_hash: "867afcc63ad63fa6"
+			}
+			{
+				name: "downloads"
+				type: "subobject_set"
+				type_hash: "d439dc6a9ccfe53b"
+			}
+			{
+				name: "last_opened_project"
+				type: "string"
+			}
+			{
+				name: "docking_settings"
+				type: "subobject"
+				type_hash: "bdd017ae48779b30"
+			}
+			{
+				name: "project_management"
+				type: "subobject"
+				type_hash: "8b8a016cc0d8f90f"
+			}
+			{
+				name: "security"
+				type: "subobject"
+				type_hash: "b0a29343c40c021f"
+			}
+			{
+				name: "plugins_settings"
+				type: "subobject"
+				type_hash: "93691adbe6989919"
+			}
 		]
+		default: {
+			network_settings: {
+			}
+			window_layouts: {
+			}
+			interface_settings: {
+			}
+			project_management: {
+			}
+			security: {
+			}
+		}
 	}
 	{
 		name: "tm_application_settings__download"
@@ -1404,7 +1670,7 @@
 				type: "float"
 			}
 			{
-				name: "vertical_fov_or_box_height"
+				name: "vertical_fov__box_height__focal_length"
 				type: "float"
 			}
 			{
@@ -1419,14 +1685,28 @@
 				name: "iso"
 				type: "float"
 			}
+			{
+				name: "sensor_size"
+				type: "subobject"
+				type_hash: "5ea1bb7b6537de46"
+			}
+			{
+				name: "focus_distance"
+				type: "float"
+			}
 		]
 		default: {
 			near_plane: 0.1000000014901161
 			far_plane: 10000
-			vertical_fov_or_box_height: 1.396263360977173
+			vertical_fov__box_height__focal_length: 1.396263360977173
 			shutter_speed: 100
 			aperture: 4
 			iso: 100
+			sensor_size: {
+				x: 36
+				y: 24
+			}
+			focus_distance: 4
 		}
 	}
 	{
@@ -2994,6 +3274,28 @@
 		]
 	}
 	{
+		name: "tm_default_render_pipe_depth_of_field"
+		properties: [
+			{
+				name: "enabled"
+				type: "bool"
+			}
+			{
+				name: "num_gather_rings"
+				type: "uint32_t"
+			}
+			{
+				name: "num_mip_levels"
+				type: "uint32_t"
+			}
+		]
+		default: {
+			enabled: true
+			num_gather_rings: 4
+			num_mip_levels: 4
+		}
+	}
+	{
 		name: "tm_default_render_pipe_exposure_component"
 		properties: [
 			{
@@ -3286,6 +3588,23 @@
 				y: 0.5
 				z: 0.5
 			}
+		}
+	}
+	{
+		name: "tm_default_render_pipeline_settings"
+		properties: [
+			{
+				name: "taa_enabled"
+				type: "bool"
+			}
+			{
+				name: "taa_gamma"
+				type: "float"
+			}
+		]
+		default: {
+			taa_enabled: true
+			taa_gamma: 1
 		}
 	}
 	{
@@ -4293,6 +4612,32 @@
 		]
 	}
 	{
+		name: "tm_interface_settings"
+		properties: [
+			{
+				name: "resolution_scale"
+				type: "float"
+			}
+			{
+				name: "wheel_scroll_lines"
+				type: "float"
+			}
+			{
+				name: "color_blind_mode"
+				type: "bool"
+			}
+			{
+				name: "throttle_in_background"
+				type: "bool"
+			}
+		]
+		default: {
+			resolution_scale: 1
+			wheel_scroll_lines: 1
+			throttle_in_background: true
+		}
+	}
+	{
 		name: "tm_keyboard_item"
 		properties: [
 			{
@@ -4300,6 +4645,23 @@
 				type: "uint32_t"
 			}
 		]
+	}
+	{
+		name: "tm_lighting_system_settings"
+		properties: [
+			{
+				name: "skydome_color"
+				type: "subobject"
+				type_hash: "11e53fa0440a07e4"
+			}
+		]
+		default: {
+			skydome_color: {
+				r: 0.1500000059604645
+				g: 0.1500000059604645
+				b: 0.1500000059604645
+			}
+		}
 	}
 	{
 		name: "tm_link_component"
@@ -4334,6 +4696,35 @@
 				type_hash: "ff156da2e01c4a3d"
 			}
 		]
+	}
+	{
+		name: "tm_localization_settings"
+		properties: [
+			{
+				name: "microsoft_cache"
+				type: "subobject"
+				type_hash: "dd1c5c1d57e9ab71"
+			}
+			{
+				name: "google_cache"
+				type: "subobject"
+				type_hash: "dd1c5c1d57e9ab71"
+			}
+			{
+				name: "language"
+				type: "string"
+			}
+			{
+				name: "google"
+				type: "bool"
+			}
+			{
+				name: "microsoft"
+				type: "bool"
+			}
+		]
+		default: {
+		}
 	}
 	{
 		name: "tm_lod_settings"
@@ -4678,6 +5069,16 @@
 		]
 	}
 	{
+		name: "tm_network_settings"
+		properties: [
+			{
+				name: "instances"
+				type: "subobject_set"
+				type_hash: "62cbfcc2497d86c7"
+			}
+		]
+	}
+	{
 		name: "tm_path_tracing_component"
 		properties: [
 		]
@@ -4723,6 +5124,10 @@
 			{
 				name: "enable_ccd"
 				type: "bool"
+			}
+			{
+				name: "lock_axis_flags"
+				type: "uint32_t"
 			}
 		]
 		default: {
@@ -4932,6 +5337,10 @@
 				name: "collision"
 				type: "reference"
 				type_hash: "a7877788271e981c"
+			}
+			{
+				name: "disable gravity"
+				type: "bool"
 			}
 		]
 		default: {
@@ -5258,6 +5667,74 @@
 		]
 	}
 	{
+		name: "tm_project_management_settings"
+		properties: [
+			{
+				name: "open_empty_project_on_startup"
+				type: "bool"
+			}
+			{
+				name: "always_open_default_project_window"
+				type: "bool"
+			}
+		]
+	}
+	{
+		name: "tm_project_settings"
+		properties: [
+			{
+				name: "path"
+				type: "string"
+			}
+			{
+				name: "global_graph_settings"
+				type: "subobject"
+				type_hash: "76c65d9a4da0f2f5"
+			}
+			{
+				name: "graphs_settings"
+				type: "subobject_set"
+				type_hash: "9aad7ddbce2c307e"
+			}
+			{
+				name: "scenes_settings"
+				type: "subobject_set"
+				type_hash: "148cf337633e02c5"
+			}
+			{
+				name: "publish_settings"
+				type: "subobject"
+				type_hash: "8eebe36bc038a3cc"
+			}
+			{
+				name: "window_layout"
+				type: "subobject_set"
+				type_hash: "1f1ea8c1548bab03"
+			}
+			{
+				name: "graph_debugger_persistent_settings"
+				type: "subobject"
+				type_hash: "74079da6d852b357"
+			}
+			{
+				name: "plugins_settings"
+				type: "subobject"
+				type_hash: "93691adbe6989919"
+			}
+		]
+		default: {
+			publish_settings: {
+				executable_name: ""
+				window_title: ""
+				world_entity: ""
+				resolution: {
+					x: 1920
+					y: 1080
+				}
+			}
+		}
+	}
+	{
 		name: "tm_properties_settings"
 		properties: [
 			{
@@ -5265,6 +5742,40 @@
 				type: "uint64_t"
 			}
 		]
+	}
+	{
+		name: "tm_publish_settings"
+		properties: [
+			{
+				name: "directory_project"
+				type: "bool"
+			}
+			{
+				name: "executable_name"
+				type: "string"
+			}
+			{
+				name: "window_title"
+				type: "string"
+			}
+			{
+				name: "world_entity"
+				type: "string"
+			}
+			{
+				name: "resolution"
+				type: "subobject"
+				type_hash: "5ea1bb7b6537de46"
+			}
+			{
+				name: "fullscreen"
+				type: "bool"
+			}
+		]
+		default: {
+			resolution: {
+			}
+		}
 	}
 	{
 		name: "tm_ray_tracing_debug"
@@ -5707,6 +6218,38 @@
 				type: "uint32_t"
 			}
 		]
+	}
+	{
+		name: "tm_settings"
+		properties: [
+			{
+				name: "audio_settings"
+				type: "subobject_set"
+				type_hash: "8944e0b1cefd4756"
+			}
+			{
+				name: "editor_settings"
+				type: "subobject_set"
+				type_hash: "8944e0b1cefd4756"
+			}
+			{
+				name: "physics_settings"
+				type: "subobject_set"
+				type_hash: "8944e0b1cefd4756"
+			}
+			{
+				name: "graphics_settings"
+				type: "subobject_set"
+				type_hash: "8944e0b1cefd4756"
+			}
+			{
+				name: "misc_settings"
+				type: "subobject_set"
+				type_hash: "8944e0b1cefd4756"
+			}
+		]
+		default: {
+		}
 	}
 	{
 		name: "tm_shader_system_blob"
@@ -7147,7 +7690,6 @@
 				h: 100
 			}
 			pixels_per_meter: 256
-			input_disabled: true
 			font_size: 9
 		}
 	}
@@ -8582,8 +9124,8 @@
 				type: "string"
 			}
 			{
-				name: "create_on_startup"
-				type: "bool"
+				name: "icon"
+				type: "uint32_t"
 			}
 			{
 				name: "window_x"
@@ -8602,9 +9144,18 @@
 				type: "float"
 			}
 			{
+				name: "maximized"
+				type: "bool"
+			}
+			{
 				name: "tabwell"
 				type: "subobject"
 				type_hash: "a1953ee0036f73e1"
+			}
+			{
+				name: "workspaces"
+				type: "subobject_set"
+				type_hash: "cdcdce9f19a8aef1"
 			}
 		]
 	}
@@ -8615,6 +9166,24 @@
 				name: "layouts"
 				type: "subobject_set"
 				type_hash: "1f1ea8c1548bab03"
+			}
+		]
+	}
+	{
+		name: "tm_workspace"
+		properties: [
+			{
+				name: "name"
+				type: "string"
+			}
+			{
+				name: "icon"
+				type: "uint32_t"
+			}
+			{
+				name: "tabwell"
+				type: "subobject"
+				type_hash: "a1953ee0036f73e1"
 			}
 		]
 	}

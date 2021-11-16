@@ -1041,6 +1041,46 @@ graph: {
 				id: "input__graph_16169466096787828905__9"
 			}
 		}
+		{
+			__uuid: "36e28d1f-81a9-306f-e7d2-100dad1e78c6"
+			to_node: "1de5064d-7525-29f9-b496-1e38375ec6fe"
+			to_connector_hash: "d4c943cba60c270b"
+			data: {
+				__type: "tm_string"
+				__uuid: "2c6e6340-a210-cd85-85d3-201d02b682d5"
+				string: "Metallic"
+			}
+		}
+		{
+			__uuid: "523508a2-c2b6-601f-cdf0-5f0337382a63"
+			to_node: "4798fc75-e469-4955-8cac-9d8bcdf5ec92"
+			to_connector_hash: "d4c943cba60c270b"
+			data: {
+				__type: "tm_string"
+				__uuid: "f8d0a7ed-1e64-b41b-96c6-524abd139ea5"
+				string: "Roughness"
+			}
+		}
+		{
+			__uuid: "86e9b072-fc13-bd51-d61a-03dc2966fed7"
+			to_node: "62f31ffc-589d-bb28-7191-b379da4b217a"
+			to_connector_hash: "d4c943cba60c270b"
+			data: {
+				__type: "tm_string"
+				__uuid: "46efe458-9c7f-5e61-ffa3-665d6938098f"
+				string: "BaseColor"
+			}
+		}
+		{
+			__uuid: "6443bd3a-ce07-8acb-13fe-1acc4d82d25b"
+			to_node: "2db83461-6030-66a3-27bc-341e4014a4bb"
+			to_connector_hash: "d4c943cba60c270b"
+			data: {
+				__type: "tm_string"
+				__uuid: "864da744-c0dc-78ba-0caf-34fdd3ad66e8"
+				string: "Emissive"
+			}
+		}
 	]
 	comments: [
 		{
@@ -1271,12 +1311,12 @@ graph: {
 			{
 				__uuid: "e104c843-70a9-86c9-5e7f-a63212c7a8fa"
 				node: "49cbc4af-8314-05fa-fabc-00884be0de7a"
-				validity_hash: "e9b3642068b30410"
+				validity_hash: "53dc5ddb582040e3"
 				object: {
 					__type: "tm_shader_system_compiled_result"
-					__uuid: "6fc2587e-99c5-35bb-9a9a-598bad42113f"
-					name: "e9b3642068b30410"
-					buffer: "f08ca978a0d25f4f"
+					__uuid: "6862404f-1d5c-add8-ac6e-89fa7c24839f"
+					name: "53dc5ddb582040e3"
+					buffer: "86816963e19d88c2"
 				}
 			}
 		]

@@ -1,5 +1,6 @@
 #ifndef FOUNDATION_MATH
 #define FOUNDATION_MATH
+#include "api_types.h"
 
 TM_DISABLE_PADDING_WARNINGS
 

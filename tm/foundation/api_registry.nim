@@ -1,7 +1,7 @@
-template tmGetApi*(reg: ptr tmApiRegistryApi, t: typed{type}): untyped =
+template get_api*(reg: ptr tm_api_registry_api, t: typed{type}): untyped =
   cast[ptr `t`](reg.get(astToStr(t), `t version`))
 
-macro tmGetApiFor*(reg: ptr tmApiRegistryApi, dests: varargs[typed]{`var` & noalias}): untyped =
+macro get_api_for*(reg: ptr tmApiRegistryApi, dests: varargs[typed]{`var` & noalias}): untyped =
   assert(dests.len > 0, "Missing arguments")
   result = newNimNode(nnkStmtList)
   for dest in dests:
@@ -25,7 +25,7 @@ template tm_set_or_remove_api*(reg: ptr tm_api_registry_api, load: bool, TYPE: u
     reg[].remove(impl)
 ]#
 
-macro tmAddOrRemoveImpl*(reg: ptr tmApiRegistryApi, load: bool, impls: varargs[typed]): untyped =
+macro add_or_remove_impl*(reg: ptr tmApiRegistryApi, load: bool, impls: varargs[typed]): untyped =
   assert(impls.len > 0, "Missing impls")
   result = newNimNode(nnkStmtList)
   for impl in impls:
@@ -34,8 +34,8 @@ macro tmAddOrRemoveImpl*(reg: ptr tmApiRegistryApi, load: bool, impls: varargs[t
       of nnkObjectTy:
          (repr(getTypeInst(impl)), newCall(ident("unsafeAddr"), impl))
       of nnkProcTy:
-        assert(impl.hasPragma("tmType"), &"proc {impl.strVal} is missing \"tmType\" pragma")
-        var pragmaType = impl.getPragmaVal("tmType")
+        assert(impl.hasCustomPragma(tmType), &"proc {impl.strVal} is missing \"tmType\" pragma")
+        var pragmaType = impl.getCustomPragmaVal(tmType)
         assert(pragmaType.symKind == nskType, &"proc {impl.strVal} \"tmType\" argument must be a type")
         var tmType = pragmaType.getImpl()
 

@@ -1,26 +1,34 @@
-proc tmCarrayHeader*(a: pointer): ptr tmCarrayHeaderT {.inline.} =
-  cast[ptr tmCarrayHeaderT](cast[ByteAddress](a) - sizeof(tmCarrayHeaderT))
+proc tm_carray_header*(a: pointer): ptr tm_carray_header_t {.inline.} =
+  cast[ptr tm_carray_header_t](cast[ByteAddress](a) - sizeof(tm_carray_header_t))
 
-proc tmCarraySize*(a: pointer): uint64 {.inline.} = 
-  if a != nil: tmCarrayHeader(a).size else: 0'u64
+proc tm_carray_size*(a: pointer): uint64 {.inline.} = 
+  if a != nil: tm_carray_header(a).size else: 0'u64
 
-proc tmCarrayCapacity*(a: pointer): uint64 {.inline.} = 
-  if a != nil: tmCarrayHeader(a).capacity else: 0'u64
+proc tm_carray_capacity*(a: pointer): uint64 {.inline.} = 
+  if a != nil: tm_carray_header(a).capacity else: 0'u64
 
-proc tmCarrayNeedsToGrow*(a: pointer, n: uint64): bool {.inline.} = 
-  n > tmCarrayCapacity(a)
+proc tm_carray_needs_to_grow*(a: pointer, n: uint64): bool {.inline.} = 
+  n > tm_carray_capacity(a)
 
-proc tmCarrayTempGrow*[T](a: var ptr T, n: uint64, ta: ptr tmTempAllocatorI) {.inline.} =  
-  a = cast[ptr T](tmCarrayTempGrowInternal(a, n, sizeof(T).uint64, ta))
+proc tm_carray_temp_grow*[T](a: var ptr T, n: uint64, ta: ptr tm_temp_allocator_i) {.inline.} =  
+  a = cast[ptr T](tm_carray_temp_grow_internal(a, n, sizeof(T).uint64, ta))
 
-proc tmCarrayTempEnsure*[T](a: var ptr T, n: uint64, ta: ptr tmTempAllocatorI) = 
-  if tmCarrayNeedsToGrow(a, n): tmCarrayTempGrow(a, n, ta)
+proc tm_carray_temp_ensure*[T](a: var ptr T, n: uint64, ta: ptr tm_temp_allocator_i) = 
+  if tm_carray_needs_to_grow(a, n): tm_carray_temp_grow(a, n, ta)
 
-proc tmCarrayTempPush*[T](a: var ptr T, item: T, ta: ptr tmTempAllocatorI): ptr T =
-  tmCarrayTempEnsure(a, tmCarraySize(a) + 1, ta)
+proc tm_carray_temp_push*[T](a: var ptr T, item: T, ta: ptr tm_temp_allocator_i): ptr T =
+  tm_carray_temp_ensure(a, tm_carray_size(a) + 1, ta)
   a[tm_carray_header(a).size.int] = item
   inc tm_carray_header(a).size 
   a[(tm_carray_header(a).size - 1).int].addr
+
+iterator carray_items*[T](a: ptr T): lent T =
+  for i in items(a, tm_carray_size(a)):
+    yield i
+
+iterator carray_mitems*[T](a: ptr T): var T =
+  for i in mitems(a, tm_carray_size(a)):
+    yield i
 
 #[
 # Returns the header data for `a`.

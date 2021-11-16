@@ -15,6 +15,7 @@
 //     simplify the interfaces.
 
 struct tm_the_truth_o;
+struct tm_plugin_o;
 
 // [[tm_plugin_init_i]] is typically called as early as possible after all plugins have been loaded.
 // [[tm_plugin_init_i]] is not called when a plugin is reloaded.

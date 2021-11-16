@@ -309,12 +309,12 @@ graph: {
 			{
 				__uuid: "753aec7f-2b2d-3280-2a29-9d4de265e216"
 				node: "8b086966-dbe9-cdda-8ab8-ddb8524310bc"
-				validity_hash: "8d91c349aa46af50"
+				validity_hash: "f11e3d2ba4688d89"
 				object: {
 					__type: "tm_shader_system_compiled_result"
-					__uuid: "6debcaf5-a55d-23b7-3c3b-6cdc671abc2d"
-					name: "8d91c349aa46af50"
-					buffer: "6dca7a4c026764a6"
+					__uuid: "1b083e2d-28b5-c19a-8cc1-7bee11ec8d91"
+					name: "f11e3d2ba4688d89"
+					buffer: "63256e44ad04351a"
 				}
 			}
 		]

@@ -6,8 +6,9 @@ description   = "The Machinery bindings generator."
 license       = "MIT"
 
 # Dependencies
-requires "nim >= 1.6.0"
+requires "nim >= 1.7.1"
 requires "https://github.com/geekrelief/ptr_math >= 0.6.0"
+requires "https://github.com/geekrelief/genit >= 0.5.0"
 
 #> configuration variables
 const mode = "--debugger:native --debuginfo:on" # -d:danger, -d:release
@@ -21,11 +22,11 @@ const tm_plugins_dir = "C:/tm/gr-tm/bin/Debug/plugins/"
 const dev = true # bindings development flag
 
 when not defined(dev):
-  requires "https://github.com/geekrelief/nimterop >= 0.8.5"
+  requires "https://github.com/geekrelief/nimterop >= 0.8.10"
 
 import globals
 import strformat, strutils
-import os
+import std/[os]
 
 proc taskParams(): seq[string] = # nimble's paramCount / paramStr is broken in v0.13.1
   var params = commandLineParams()
@@ -34,10 +35,9 @@ proc taskParams(): seq[string] = # nimble's paramCount / paramStr is broken in v
   else:
     @[]
   
-task removePragmaOnce, "Removes pragma once":
-  exec "nim r remove_pragma_once.nim"
-
 task gen, "Generate the binding":
+  exec "nim r remove_pragma_once.nim"
+  exec "nim r -d:release deps.nim"
   if dev:
     exec &"nim c -d:dev --cc:{cc} tm_gen.nim"
   else:
@@ -71,10 +71,10 @@ proc buildProject(name, targetDir: string = ""): void =
   let settings = commonFlags() & &"-o:{dll} --outdir:\"{outdir}\""
   exec &"nim c {settings.join(\" \")} {nimFilePath}"
   var targetDir = if targetDir.len == 0: tm_plugins_dir else: targetDir
-  targetDir.normalizePathEnd(true)
   mkdir(targetDir)
-  if outdir != targetDir:
+  if outdir.normalizedPath != targetDir.normalizedPath:
     cpFile(outdir & dll, targetDir & dll)
+
 
 task new, "Creates scaffolding for new plugin":
   var params = taskParams()
@@ -109,7 +109,8 @@ task minimal, "Build the minimal sample":
   buildProject("minimal")
 
 task simentry, "Build the simulation entry sample":
-  buildProject("custom_simulation_entry", "C:/tm/tm-nim/build/samples/plugins/simulation/")
+  #buildProject("custom_simulation_entry", "C:/tm/tm-nim/build/samples/plugins/simulation/")
+  buildProject("custom_simulation_entry")
 
 task callbacks, "Build the plugin_callbacks sample":
   buildProject("plugin_callbacks")
@@ -117,3 +118,6 @@ task callbacks, "Build the plugin_callbacks sample":
 task component, "Build the custom component sample":
   #buildProject("custom_component", "C:/tm/tm-nim/build/samples/plugins/custom_component/")
   buildProject("custom_component")
+
+task first, "Build gameplay sample first person":
+  buildProject("gameplay_sample_first_person", "C:/tm/tm-nim/build/samples/plugins/gameplay_sample_first_person/")

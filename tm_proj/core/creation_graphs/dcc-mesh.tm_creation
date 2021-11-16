@@ -18,8 +18,8 @@ graph: {
 		{
 			__uuid: "f4d0ae36-14dd-ae19-3b27-9330e921d45a"
 			type: "bounding_volume"
-			position_x: 167.5657958984375
-			position_y: 130.4166259765625
+			position_x: 166.5657958984375
+			position_y: 155.4166259765625
 		}
 		{
 			__uuid: "3fbd878d-06eb-a80a-96cf-75e3798cd9e0"
@@ -125,13 +125,23 @@ graph: {
 				uint32_t: 1
 			}
 		}
+		{
+			__uuid: "91d9d04b-462f-c883-7a80-ee7d0dea80ae"
+			to_node: "7fa4cb3a-234f-d0ac-e41f-ef7014f05547"
+			to_connector_hash: "d4c943cba60c270b"
+			data: {
+				__type: "tm_string"
+				__uuid: "5d50dac0-6caf-c3f3-9244-9c98888f9096"
+				string: "mesh"
+			}
+		}
 	]
 	comments: [
 		{
 			__uuid: "70a52aae-d806-46e4-be75-910c86df06a3"
 			text: "Default creation graph for rendering meshes in a dcc_asset."
-			position_x: -359.100830078125
-			position_y: -188.5833129882813
+			position_x: -367.100830078125
+			position_y: -167.5833129882813
 			font_scale: 2
 			tint_color: {
 				__uuid: "09369df5-ed22-39ad-d2dc-51c4141edc12"
