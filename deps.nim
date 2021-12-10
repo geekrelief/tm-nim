@@ -1,5 +1,5 @@
-# This script determines the dependencies between headers and produces a file with the order
-# for nimterop to process the headers.
+# This script does a topological sort of the header dependencies and produces a file with the order
+# for nimterop. This helps to produce cleaner output for debugging.
 
 import globals, std / [os, sugar, strformat, strutils, sequtils, streams, re, algorithm, sets]
 
