@@ -8,7 +8,7 @@ license       = "MIT"
 # Dependencies
 requires "nim >= 1.7.1"
 requires "https://github.com/geekrelief/ptr_math >= 0.6.0"
-requires "https://github.com/geekrelief/genit >= 0.5.0"
+requires "https://github.com/geekrelief/genit >= 0.7.0"
 
 #> configuration variables
 const mode = "--debugger:native --debuginfo:on" # -d:danger, -d:release
@@ -19,7 +19,7 @@ const build_dir = "C:/tm/tm-nim/build/samples/plugins/"
 const tm_plugins_dir = "C:/tm/gr-tm/bin/Debug/plugins/"
 #< configuration variables
 
-const dev = true # bindings development flag
+const dev = false # bindings development flag
 
 when not defined(dev):
   requires "https://github.com/geekrelief/nimterop >= 0.8.10"
@@ -47,6 +47,7 @@ proc commonFlags(): seq[string] =
   var flags = @[&"--cc:{cc}"]
   if dev:
     flags.add "--path:\"../gr-ptr_math/src\""
+    flags.add "--path:\"../genit/src\""
 
   flags.add case cc:
     of "vcc":

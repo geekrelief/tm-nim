@@ -364,8 +364,8 @@ proc tick(state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t
       
       if e0.u64 != s.box.u64 and e1.u64 != s.box.u64: continue
 
-      gen(tapi = tag_component_api, red, green, blue):
-        let `on it` = tapi.has_tag(s.tag_man, e0, `it tag`) and tapi.has_tag(s.tag_man, e1, `it tag`)
+      gen(t = tag_component_api, red, green, blue):
+        let `on it` = t.has_tag(s.tag_man, e0, `it tag`) and t.has_tag(s.tag_man, e1, `it tag`)
       if not (onRed or onGreen or onBlue): continue
 
       touching_correct_drop_zone = true
@@ -385,7 +385,7 @@ proc tick(state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t
       s.box_state = BOX_STATE_FLYING_UP
     else:
       # If box is not in correct drop zone and player clicks left mouse button, try picking it up using raycast.
-      let r = physx_scene_api.raycast(physx_scene, camera_pos, camera_forward, 25f, s.player_collision_type, tm_physx_raycast_flags_t(), nil, 0)
+      let r = physx_scene_api.raycast(physx_scene, camera_pos, camera_forward, 2.5f, s.player_collision_type, tm_physx_raycast_flags_t(), nil, 0)
       if r.has_block:
         let hit = r.block.body
         if s.box.u64 == hit.u64:
@@ -414,7 +414,7 @@ proc tick(state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t
       entity_api.remove_component(s.entity_ctx, s.box, s.physx_rigid_body_component)
 
       physx_scene_api.set_kinematic(physx_scene, s.box, false)
-      physx_scene_api.add_force(physx_scene, s.box, tm_vec3_mul(camera_forward, 4500 * args.dt), TM_PHYSX_FORCE_FLAGS_IMPULSE)
+      physx_scene_api.add_force(physx_scene, s.box, tm_vec3_mul(camera_forward, 1500 * args.dt), TM_PHYSX_FORCE_FLAGS_IMPULSE)
       s.box_state = BOX_STATE_FREE
 
   of BOX_STATE_FLYING_UP:
@@ -431,8 +431,6 @@ proc tick(state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t
       box_pos = tc_api.get_position(s.trans_man, s.box)
       box_to_spawn = tm_vec3_sub(s.box_starting_point, box_pos)
       spawn_point_dir = tm_vec3_normalize(box_to_spawn)
-
-    change_box_to_random_color(s)
 
     if tm_vec3_length(box_to_spawn) < 0.1f:
       tc_api.set_position(s.trans_man, s.box, s.box_starting_point)

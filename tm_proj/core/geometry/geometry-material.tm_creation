@@ -109,3 +109,8 @@ __asset_uuid: "cc1c00c8-b9e1-58d5-f07f-07ca6e985f52"
 __asset_labels: [
 	"672a73adabfebcc2"
 ]
+__asset_thumbnail: {
+	__uuid: "5b05615f-4fd8-f492-2da9-78fd7e9b57c3"
+	thumbnail: "7e8e1c60aabbdaeb"
+	validity_hash: "21134e741f60e0fb"
+}

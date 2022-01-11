@@ -390,6 +390,49 @@
 						}
 					]
 				}
+				{
+					name: "."
+					curves: [
+						{
+							name: "transform.local.pos"
+							type: 2
+							x: {
+								keys: [
+									{
+										value: 1
+									}
+									{
+										time: 1
+										value: 1
+									}
+								]
+							}
+							y: {
+								keys: [
+									{
+										value: 0.5
+									}
+									{
+										time: 1
+										value: 0.699999988079071
+									}
+								]
+							}
+							z: {
+								keys: [
+									{
+									}
+									{
+										time: 1
+										value: 0.2000000029802322
+									}
+								]
+							}
+							w: {
+							}
+						}
+					]
+				}
 			]
 		}
 	}
@@ -779,15 +822,52 @@
 			}
 		]
 		default: {
+			default_camera: {
+				sensor_size: {
+					x: 36
+					y: 24
+				}
+			}
 			network_settings: {
+			}
+			grid_settings: {
+				thin_color: {
+					r: 0.07000000029802322
+					g: 0.07000000029802322
+					b: 0.07000000029802322
+				}
+				thick_color: {
+					r: 0
+					g: 0
+					b: 0
+				}
+				origin_axis_x_color: {
+					g: 0.03299999982118607
+					b: 0.07999999821186066
+				}
+				origin_axis_z_color: {
+					r: 0.02199999988079071
+					g: 0.2630000114440918
+				}
 			}
 			window_layouts: {
 			}
 			interface_settings: {
 			}
+			localization_settings: {
+				language: ""
+			}
+			keyboard_shortcuts: {
+			}
+			updates: {
+			}
+			docking_settings: {
+			}
 			project_management: {
 			}
 			security: {
+			}
+			plugins_settings: {
 			}
 		}
 	}
@@ -4724,6 +4804,10 @@
 			}
 		]
 		default: {
+			microsoft_cache: {
+			}
+			google_cache: {
+			}
 		}
 	}
 	{
@@ -5723,6 +5807,8 @@
 			}
 		]
 		default: {
+			global_graph_settings: {
+			}
 			publish_settings: {
 				executable_name: ""
 				window_title: ""
@@ -5731,6 +5817,10 @@
 					x: 1920
 					y: 1080
 				}
+			}
+			graph_debugger_persistent_settings: {
+			}
+			plugins_settings: {
 			}
 		}
 	}
