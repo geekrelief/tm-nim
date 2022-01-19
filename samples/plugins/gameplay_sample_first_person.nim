@@ -336,7 +336,7 @@ proc tick(state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t
 
     # Jump
     if s.input.held_keys[TM_INPUT_KEYBOARD_ITEM_SPACE] and player_mover.is_standing:
-      player_mover.velocity.y = 5
+      player_mover.velocity.y = 15
 
   # Box carry anchor is kinematic physics body (so we can put joints on it), move it manually
   let 
@@ -432,6 +432,8 @@ proc tick(state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t
       box_to_spawn = tm_vec3_sub(s.box_starting_point, box_pos)
       spawn_point_dir = tm_vec3_normalize(box_to_spawn)
 
+    change_box_to_random_color(s)
+      
     if tm_vec3_length(box_to_spawn) < 0.1f:
       tc_api.set_position(s.trans_man, s.box, s.box_starting_point)
       physx_scene_api.set_kinematic(physx_scene, s.box, false)

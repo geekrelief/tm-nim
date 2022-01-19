@@ -78,6 +78,7 @@ macro TM_STATIC_HASH*(x: static string, h: uint64 = 0): tm_strhash_t =
       h
   result = newTree(nnkCast, ident("tm_strhash_t"), hashLit)
 
+
 #== helpers ==
 proc vec2*(x, y: float = 0f): tm_vec2_t {.inline.} =
   tm_vec2_t(x: x, y: y)

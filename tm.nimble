@@ -9,6 +9,7 @@ license       = "MIT"
 requires "nim >= 1.7.1"
 requires "https://github.com/geekrelief/ptr_math >= 0.6.0"
 requires "https://github.com/geekrelief/genit >= 0.7.0"
+requires "elvis >= 0.4.0"
 
 #> configuration variables
 const mode = "--debugger:native --debuginfo:on" # -d:danger, -d:release
@@ -60,7 +61,7 @@ proc commonFlags(): seq[string] =
     else: 
       raise newException(Defect, cc & " is not supported.")
 
-  flags &= @["--app:lib", "--gc:arc", &"{mode}", "--nomain:on", "--include:globals.nim", "--path:.", "--path:tm", "--path:samples"]
+  flags &= @["--app:lib", "--mm:arc", &"{mode}", "--nomain:on", "--include:globals.nim", "--path:.", "--path:tm", "--path:samples"]
   flags
 
 
@@ -122,3 +123,6 @@ task component, "Build the custom component sample":
 
 task first, "Build gameplay sample first person":
   buildProject("gameplay_sample_first_person", "C:/tm/tm-nim/build/samples/plugins/gameplay_sample_first_person/")
+
+task third, "Build gameplay sample third person":
+  buildProject("gameplay_sample_third_person", "C:/tm/tm-nim/build/samples/plugins/gameplay_sample_third_person/")

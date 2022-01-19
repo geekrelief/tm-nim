@@ -32,7 +32,7 @@ macro add_or_remove_impl*(reg: ptr tmApiRegistryApi, load: bool, impls: varargs[
     let t = getTypeImpl(impl)
     var (tname, p) = case t.kind:
       of nnkObjectTy:
-         (repr(getTypeInst(impl)), newCall(ident("unsafeAddr"), impl))
+         (repr(getTypeInst(impl)), newCall(ident("addr"), impl))
       of nnkProcTy:
         assert(impl.hasCustomPragma(tmType), &"proc {impl.strVal} is missing \"tmType\" pragma")
         var pragmaType = impl.getCustomPragmaVal(tmType)
@@ -53,3 +53,16 @@ macro add_or_remove_impl*(reg: ptr tmApiRegistryApi, load: bool, impls: varargs[
         reg[].addImplementation(tname, tversion, p)
       else:
         reg[].removeImplementation(tname, tversion, p)
+
+
+template num_implementations*(reg: ptr tm_api_registry_api, t: typed{type}): untyped =
+  reg.num_implementations(astToStr(t), `t version`)
+
+template implementations*(reg: ptr tm_api_registry_api, t: typed{type}): untyped =
+  cast[ptr `t`](reg.implementations(astToStr(t), `t version`))
+
+template single_implementation*(reg: ptr tm_api_registry_api, t: typed{type}): untyped =
+  cast[ptr `t`](reg.single_implementation(astToStr(t), `t version`))
+
+template first_implementation*(reg: ptr tm_api_registry_api, t: typed{type}): untyped =
+  cast[ptr `t`](reg.first_implementation(astToStr(t), `t version`))

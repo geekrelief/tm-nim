@@ -1,4 +1,4 @@
-macro alloc*(a: ptr tmAllocatorI, init: typed): untyped =
+macro alloc*(a: ptr tm_allocator_i, init: typed): untyped =
   ## Allocates and initializes a structure to pass to TM
   ## Ex: 
   ## result = args.allocator.alloc(simulation_state_o(

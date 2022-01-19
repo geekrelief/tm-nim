@@ -54,4 +54,4 @@ proc murmurHash64A*(key: ptr uint8, len: int, seed: uint64 = 0): uint64 =
   # echo &"{bytes},{seed} -> {result}"
 
 proc murmurHash64A*(x: string, seed = 0'u64): auto =
-  murmurHash64A(cast[ptr uint8](x[0].unsafeAddr), x.len, seed)
+  murmurHash64A(cast[ptr uint8](x[0].addr), x.len, seed)
