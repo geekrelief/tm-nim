@@ -70,7 +70,7 @@ proc componentAssetReloaded(man: ptr tm_component_manager_o, commands: ptr tm_en
 proc componentCreate(ctx: ptr tm_entity_context_o) {.cdecl, tmType: tm_entity_create_component_i.} =
   var component = tm_component_i(
     name: TtTypeCustomComponent,
-    bytes: sizeof(CustomComponentT).uint32,
+    bytes: sizeu32(CustomComponentT),
     loadAsset: componentLoadAsset,
     assetReloaded: componentAssetReloaded,
     )

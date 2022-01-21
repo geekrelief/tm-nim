@@ -10,7 +10,7 @@ macro alloc*(a: ptr tm_allocator_i, init: typed): untyped =
   
   result = genAst(a, TYPE = getTypeInst(init), init):
     let i = instantiationInfo()
-    let p = cast[ptr TYPE](a.realloc(a, cast[pointer](0), 0, sizeof(TYPE).uint64, cstring(i.filename), i.line.uint32))
+    let p = cast[ptr TYPE](a.realloc(a, cast[pointer](0), 0, sizeu64(TYPE), cstring(i.filename), i.line.uint32))
     p[] = init
     p
 
@@ -22,7 +22,7 @@ template free*(a: ptr tm_allocator_i, p: untyped) =
   ##  var s = cast[ptr simulation_state_o](state)
   ##  s.allocator.free(s)
   let i = instantiationInfo()
-  discard a[].realloc(a, p, sizeof(p[]).uint64, 0, cstring(i.filename), i.line.uint32)
+  discard a[].realloc(a, p, sizeu64(p[]), 0, cstring(i.filename), i.line.uint32)
 
 # Convenience macro for reallocating memory using [[tm_allocator_i]].
 #define tm_realloc(a, p, old_sz, new_sz) (a)->realloc(a, p, old_sz, new_sz, __FILE__, __LINE__)

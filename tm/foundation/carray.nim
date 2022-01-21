@@ -11,7 +11,7 @@ proc tm_carray_needs_to_grow*(a: pointer, n: uint64): bool {.inline.} =
   n > tm_carray_capacity(a)
 
 proc tm_carray_temp_grow*[T](a: var ptr T, n: uint64, ta: ptr tm_temp_allocator_i) {.inline.} =  
-  a = cast[ptr T](tm_carray_temp_grow_internal(a, n, sizeof(T).uint64, ta))
+  a = cast[ptr T](tm_carray_temp_grow_internal(a, n, sizeu64(T), ta))
 
 proc tm_carray_temp_ensure*[T](a: var ptr T, n: uint64, ta: ptr tm_temp_allocator_i) = 
   if tm_carray_needs_to_grow(a, n): tm_carray_temp_grow(a, n, ta)

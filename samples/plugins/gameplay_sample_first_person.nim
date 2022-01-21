@@ -144,13 +144,13 @@ proc deserialize(d, s: pointer) {.cdecl.} =
 proc update_box_material(state: ptr simulation_state_o) =
   let box: tm_entity_t = state.box
 
-  if box.u64 != 0:
+  if ?box.u64:
     var material: tm_tt_id_t = gen(red, green, blue):
       case state.box_color:
         of `^it`: the_truth_assets_api.asset_object_from_path(state.tt, state.asset_root, "materials/box-" & $$it & "-mat.creation")
     
     let cube = box
-    if cube.u64 == 0: return
+    if !cube.u64: return
 
     var ta = temp_allocator_api.init()
     var instances = creation_graph_api.get_instances_from_component(state.tt, state.entity_ctx, cube, TM_TT_TYPE_HASH_RENDER_COMPONENT, ta)
@@ -168,7 +168,7 @@ proc update_box_material(state: ptr simulation_state_o) =
     )
 
     for instance in instances.items(tm_carray_size(instances)):
-      creation_graph_api.set_input_value(instance, addr cg_ctx, TM_STATIC_HASH("material"), addr mat, sizeof(mat).uint32)
+      creation_graph_api.set_input_value(instance, addr cg_ctx, TM_STATIC_HASH("material"), addr mat, sizeu32(mat))
 
 proc change_box_to_random_color(state: ptr simulation_state_o) =
   var box = state.box
@@ -228,7 +228,7 @@ proc start(args: ptr tm_simulation_start_args_t): ptr tm_simulation_state_o {.cd
   var gamestate = entity_api.gamestate(s.entity_ctx)
   var gs = tm_gamestate_singleton_t(
     name: singleton_name,
-    size: sizeof(simulate_persistent_state).uint32,
+    size: sizeu32(simulate_persistent_state),
     serialize: serialize,
     deserialize: deserialize)
   
@@ -253,9 +253,9 @@ proc tick(state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t
     mouse_captured_this_frame = s.mouse_captured
   while (true):
     let n = input_api.events(s.processed_events, addr events[0], 32)
-
-    for e in events:
-      if e.source.isNil: continue
+    for i in 0..<n:
+      var e = events[i]
+      if !e.source: continue
       if mouse_captured_this_frame:
         if e.source.controller_type == TM_INPUT_CONTROLLER_TYPE_MOUSE:
           if e.item_id == TM_INPUT_MOUSE_ITEM_BUTTON_LEFT:
@@ -283,7 +283,7 @@ proc tick(state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t
       break
 
   # Capture mouse
-  if args.ui != nil:
+  if ?args.ui:
     if not args.running_in_editor or ui_api.is_hovering(args.ui, args.rect, 0) and s.input.left_mouse_pressed:
       s.mouse_captured = true
     if args.running_in_editor and s.input.held_keys[TM_INPUT_KEYBOARD_ITEM_ESCAPE] or not ui_api.window_has_focus(args.ui):
@@ -296,7 +296,7 @@ proc tick(state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t
     let `camera it[0]` = tc_api.`get it[1]`(s.trans_man, s.player_camera)
   let player_mover = cast[ptr tm_physx_mover_component_t](entity_api.get_component(s.entity_ctx, s.player, s.mover_component))
 
-  TM_ASSERT(player_mover != nil, error_api.def, "Invalid player"):
+  TM_ASSERT(?player_mover, error_api.def, "Invalid player"):
     return
 
   # Process input if mouse is captured
@@ -336,7 +336,7 @@ proc tick(state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t
 
     # Jump
     if s.input.held_keys[TM_INPUT_KEYBOARD_ITEM_SPACE] and player_mover.is_standing:
-      player_mover.velocity.y = 15
+      player_mover.velocity.y = 5
 
   # Box carry anchor is kinematic physics body (so we can put joints on it), move it manually
   let 
@@ -443,7 +443,7 @@ proc tick(state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t
       let interoplate_to_start_pos = tm_vec3_add(box_pos, tm_vec3_mul(spawn_point_dir, args.dt * 10))
       tc_api.set_position(s.trans_man, s.box, interoplate_to_start_pos)
 
-  if args.ui != nil:
+  if ?args.ui:
     discard
     # UI: Score
     var ui_label = tm_ui_label_t(
