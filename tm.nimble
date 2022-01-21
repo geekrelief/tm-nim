@@ -38,7 +38,8 @@ proc taskParams(): seq[string] = # nimble's paramCount / paramStr is broken in v
     @[]
   
 task gen, "Generate the binding":
-  exec "nim r remove_pragma_once.nim"
+  if cc == "tcc":
+    exec "nim r remove_pragma_once.nim"
   exec "nim r -d:release deps.nim"
   if dev:
     exec &"nim c -d:dev --cc:{cc} tm_gen.nim"
