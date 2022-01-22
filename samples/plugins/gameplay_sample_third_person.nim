@@ -156,7 +156,7 @@ proc private_adjust_effect_start_color(s: ptr simulation_state_o, p: tm_entity_t
   var rc = cast[ptr tm_render_component_public_t](entity_api.get_component(s.entity_ctx, p, s.render_component))
   let draw: ptr tm_creation_graph_draw_call_data_t = render_component_api.draw_call(rc, TM_STATIC_HASH("vfx"))
 
-  if !draw or !draw.shader: return # this is buggy, draw is nil
+  if !draw.shader: return # this is buggy, draw is nil
   
   var res_buf: ptr tm_renderer_resource_command_buffer_o
   s.rb.create_resource_command_buffers(s.rb.inst, addr res_buf, 1)

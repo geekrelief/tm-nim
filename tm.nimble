@@ -9,7 +9,7 @@ license       = "MIT"
 requires "nim >= 1.7.1"
 requires "https://github.com/geekrelief/ptr_math >= 0.6.0"
 requires "https://github.com/geekrelief/genit >= 0.9.0"
-#requires "https://github.com/geekrelief/elvis#main"
+requires "https://github.com/geekrelief/nillean >= 0.1.0"
 
 const dev = false # bindings development flag
 

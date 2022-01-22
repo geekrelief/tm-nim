@@ -3,8 +3,8 @@ import std / [
   genasts, 
   strformat
   ]
-import ptr_math, genit
-export ptr_math, genit
+import ptr_math, genit, nillean
+export ptr_math, genit, nillean
 
 # pragmas can't be exported from a module 
 {.pragma: callback, exportc: "tm_load_plugin", cdecl, dynlib.}
@@ -23,25 +23,6 @@ template sizeu64*(x): untyped =
 func toArray*[T](n: static uint, a: varargs[T]): array[n, T] =
   for i, x in a:
     result[i] = x
-
-# helpers for truthy checking
-template `!`*(x: SomeInteger): untyped =
-  x == 0
-
-template `?`*(x: SomeInteger): untyped =
-  x != 0
-
-template `!`*(x: SomeFloat): untyped =
-  x == 0
-
-template `?`*(x: SomeFloat): untyped =
-  x != 0
-
-template `!`*(x: ptr | ref | pointer): untyped =
-  x.isNil
-
-template `?`*(x: ptr | ref | pointer): untyped =
-  x != nil
 
 include foundation / api_types
 include tm_generated
