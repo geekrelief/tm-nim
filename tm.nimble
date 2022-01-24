@@ -8,7 +8,7 @@ license       = "MIT"
 # Dependencies
 requires "nim >= 1.7.1"
 requires "https://github.com/geekrelief/ptr_math >= 0.6.0"
-requires "https://github.com/geekrelief/genit >= 0.9.0"
+requires "https://github.com/geekrelief/genit >= 0.10.0"
 requires "https://github.com/geekrelief/nillean >= 0.1.0"
 
 const dev = false # bindings development flag
@@ -50,7 +50,7 @@ proc commonFlags(): seq[string] =
   var flags = @[&"--cc:{cc}"]
   if dev:
     flags.add "--path:\"../gr-ptr_math/src\""
-    flags.add "--path:\"../genit/src\""
+    flags.add "--path:\"../../nimdev/genit/src\""
     #flags.add "--path:\"../../nimdev/elvis/\""
 
   flags.add case cc:
