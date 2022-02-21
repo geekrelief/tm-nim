@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOUNDATION_API_REGISTRY
+#define FOUNDATION_API_REGISTRY
 
 #include "api_types.h"
 
@@ -634,5 +635,8 @@ void tm_shutdown_global_api_registry(struct tm_allocator_i *a);
 // Convenience function to register all foundation APIs in the specified
 // registry.
 void tm_register_all_foundation_apis(struct tm_api_registry_api *pr);
+
+#endif
+
 
 #endif

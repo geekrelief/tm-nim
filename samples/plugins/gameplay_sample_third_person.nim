@@ -220,7 +220,7 @@ proc tick(state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t
   if s.mouse_captured:
     # Exit on ESC
     if not args.running_in_editor and s.input.held_keys[TM_INPUT_KEYBOARD_ITEM_ESCAPE]:
-      application_api.exit(application_api.application())
+      application_api.exit(application_api.application(), false)
     
     # Camera pan control
     let

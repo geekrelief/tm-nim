@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOUNDATION_ERROR
+#define FOUNDATION_ERROR
 
 #include "api_types.h"
 
@@ -156,3 +157,5 @@ extern struct tm_error_api *tm_error_api;
 
 // Used to mark a function that has been deprecated and will be potentially deleted in a future release.
 #define TM_DEPRECATED(message) TM_ERROR("function `%s` has been deprecated. %s", __func__, message)
+
+#endif

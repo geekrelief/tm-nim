@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOUNDATION_APPLICATION
+#define FOUNDATION_APPLICATION
 
 #include "api_types.h"
 
@@ -10,6 +11,7 @@ struct tm_network_o;
 struct tm_render_pipeline_vt;
 struct tm_window_platform_data_o;
 struct tm_tab_create_context_t;
+struct tm_window_o;
 
 typedef struct tm_application_o tm_application_o;
 
@@ -113,3 +115,6 @@ struct tm_application_api
 };
 
 #define tm_application_api_version TM_VERSION(2, 0, 0)
+
+
+#endif

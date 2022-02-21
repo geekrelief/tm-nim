@@ -303,7 +303,7 @@ proc tick(state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t
   if s.mouse_captured:
     # Exit on ESC
     if not args.running_in_editor and s.input.held_keys[TM_INPUT_KEYBOARD_ITEM_ESCAPE]:
-      application_api.exit(application_api.application())
+      application_api.exit(application_api.application(), false)
     
     var local_movement: tm_vec3_t
     gen (A, `-=`, x), (D, `+=`, x), (W, `-=`, z), (S, `+=`, z):
@@ -414,7 +414,7 @@ proc tick(state: ptr tm_simulation_state_o, args: ptr tm_simulation_frame_args_t
       entity_api.remove_component(s.entity_ctx, s.box, s.physx_rigid_body_component)
 
       physx_scene_api.set_kinematic(physx_scene, s.box, false)
-      physx_scene_api.add_force(physx_scene, s.box, tm_vec3_mul(camera_forward, 1500 * args.dt), TM_PHYSX_FORCE_FLAGS_IMPULSE)
+      physx_scene_api.add_force(physx_scene, s.box, tm_vec3_mul(camera_forward, 2500 * args.dt), TM_PHYSX_FORCE_FLAGS_IMPULSE)
       s.box_state = BOX_STATE_FREE
 
   of BOX_STATE_FLYING_UP:

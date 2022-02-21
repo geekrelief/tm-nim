@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOUNDATION_TEMP_ALLOCATOR
+#define FOUNDATION_TEMP_ALLOCATOR
 
 #include "api_types.h"
 
@@ -191,4 +192,7 @@ static inline void *tm_temp_alloc(tm_temp_allocator_i *ta, uint64_t sz)
 
 #if defined(TM_LINKS_FOUNDATION)
 extern struct tm_temp_allocator_api *tm_temp_allocator_api;
+#endif
+
+
 #endif

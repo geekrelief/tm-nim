@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOUNDATION_API_TYPES
+#define FOUNDATION_API_TYPES
 
 #include <stdarg.h>
 #include <stdbool.h>
@@ -452,6 +453,12 @@ extern "C" void use_extern_c_wrapper_to_include_the_machinery_headers_in_cpp_fil
 
 #if defined(TM_OS_WINDOWS)
 
+#if defined(TCC)
+#define TM_DISABLE_PADDING_WARNINGS
+#define TM_RESTORE_PADDING_WARNINGS
+#else
+
+
 // Disable warnings about padding inserted into structs. Use this before including external headers
 // that do not explicitly declare padding. Restore the padding warning afterwards with
 // [[TM_RESTORE_PADDING_WARNINGS]].
@@ -463,6 +470,7 @@ extern "C" void use_extern_c_wrapper_to_include_the_machinery_headers_in_cpp_fil
 #define TM_RESTORE_PADDING_WARNINGS \
     __pragma(warning(pop))
 
+#endif
 #elif defined(__clang__)
 // tm_docgen ignore
 #define TM_DISABLE_PADDING_WARNINGS  \
@@ -511,4 +519,6 @@ extern "C" void use_extern_c_wrapper_to_include_the_machinery_headers_in_cpp_fil
 #define TM_PAGE_SIZE 16384
 #else
 #define TM_PAGE_SIZE 4096
+#endif
+
 #endif

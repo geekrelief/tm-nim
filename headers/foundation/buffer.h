@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOUNDATION_BUFFER
+#define FOUNDATION_BUFFER
 
 #include "api_types.h"
 
@@ -169,4 +170,7 @@ struct tm_buffers_api
 
 #if defined(TM_LINKS_FOUNDATION)
 extern struct tm_buffers_api *tm_buffers_api;
+#endif
+
+
 #endif

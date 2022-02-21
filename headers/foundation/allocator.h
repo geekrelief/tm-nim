@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOUNDATION_ALLOCATOR
+#define FOUNDATION_ALLOCATOR
 
 #include "api_types.h"
 
@@ -160,4 +161,7 @@ struct tm_allocator_api
 
 #if defined(TM_LINKS_FOUNDATION)
 extern struct tm_allocator_api *tm_allocator_api;
+#endif
+
+
 #endif

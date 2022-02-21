@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOUNDATION_INPUT
+#define FOUNDATION_INPUT
 
 #include "api_types.h"
 
@@ -550,4 +551,7 @@ struct tm_input_api
 
 #if defined(TM_LINKS_FOUNDATION)
 extern struct tm_input_api *tm_input_api;
+#endif
+
+
 #endif
