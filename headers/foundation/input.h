@@ -1,5 +1,4 @@
-#ifndef FOUNDATION_INPUT
-#define FOUNDATION_INPUT
+#pragma once
 
 #include "api_types.h"
 
@@ -58,10 +57,10 @@ enum tm_input_touch_item {
     TM_INPUT_TOUCH_ITEM_COUNT,
 };
 
+// clang-format off
+
 // Common input items for keyboards -- the first `0xff` entries in this list correspond to Windows
 // virtual key codes, subsequent items are added to extend with keys available on other systems.
-//
-// clang-format off
 enum tm_input_keyboard_item {
     // Standard windows keys.
 
@@ -551,7 +550,4 @@ struct tm_input_api
 
 #if defined(TM_LINKS_FOUNDATION)
 extern struct tm_input_api *tm_input_api;
-#endif
-
-
 #endif

@@ -1,5 +1,4 @@
-#ifndef FOUNDATION_BUFFER
-#define FOUNDATION_BUFFER
+#pragma once
 
 #include "api_types.h"
 
@@ -11,6 +10,26 @@ struct tm_file_o;
 // data, etc). The Buffer API provides reference counting and streaming for buffers.
 
 typedef struct tm_buffers_o tm_buffers_o;
+
+// Header used for compressed buffers. We compress buffers in some circumstances (such as when
+// saving them to disk) in order to save space. The in-memory buffer representation managed by
+// the [[tm_buffers_i]] is always uncompressed.
+typedef struct tm_buffer_compressed_header_t
+{
+    // Magic cookie indicating that the buffer is compressed. We rely on no uncompressed buffers
+    // starting with this value.
+    char magic_cookie[8];
+
+    // Total size of the uncompressed buffer.
+    uint64_t uncompressed_size;
+} tm_buffer_compressed_header_t;
+
+// Magick cookie value for [[tm_buffer_compressed_header_t]] that indicates that the buffer has
+// been blockwise compressed in blocks of size [[TM_BUFFER_COMPRESSED_LZ4_BLOCK_SIZE]].
+#define TM_BUFFER_COMPRESSED_LZ4_BLOCK_COOKIE "LZ4BLOC"
+
+// Block size used for [[TM_BUFFER_COMPRESSED_LZ4_BLOCK_COOKIE]] compression.
+#define TM_BUFFER_COMPRESSED_LZ4_BLOCK_SIZE (1024 * 1024)
 
 // Manages a set of "buffers". A buffer is an immutable blob of binary data .
 //
@@ -84,16 +103,16 @@ typedef struct tm_streamable_buffers_i
     //
     // If `hash` is non-zero, the specified value is used for the hash of the data, otherwise, the
     // hash is computed for the data.
-    uint32_t (*map)(tm_buffers_o *inst, const char *path, uint64_t offset, uint64_t size,
+    uint32_t (*map)(tm_buffers_o *inst, const char *path, uint64_t offset, uint64_t file_size,
         uint64_t hash);
 
     // Creates a streamable buffer mapped to an asset database (see [[asset_database.h]]).
     //
-    // `hash` and `size` specify the hash and size of the buffer. The buffer is stored in a sequence
-    // of linked "pages" of size `page_size`. Pages have `page_header_size` byte header where the
-    // first four bytes are the index of the next page in the sequence. After the header bytes, the
-    // data for the page follows.
-    uint32_t (*map_database)(tm_buffers_o *inst, uint64_t hash, uint64_t size, const struct tm_file_o *file,
+    // `hash` and `file_size` specify the hash and size of the buffer. The buffer is stored in a
+    // sequence of linked "pages" of size `page_size`. Pages have `page_header_size` byte header
+    // where the first four bytes are the index of the next page in the sequence. After the header
+    // bytes, the data for the page follows.
+    uint32_t (*map_database)(tm_buffers_o *inst, uint64_t hash, uint64_t file_size, const struct tm_file_o *file,
         uint32_t page_size, uint32_t page_header_size, uint32_t first_page);
 
     // Returns *true* if the specified buffer is backed by file data, *false* if it only exists in
@@ -150,7 +169,4 @@ struct tm_buffers_api
 
 #if defined(TM_LINKS_FOUNDATION)
 extern struct tm_buffers_api *tm_buffers_api;
-#endif
-
-
 #endif

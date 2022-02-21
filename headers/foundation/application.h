@@ -1,5 +1,4 @@
-#ifndef FOUNDATION_APPLICATION
-#define FOUNDATION_APPLICATION
+#pragma once
 
 #include "api_types.h"
 
@@ -9,6 +8,8 @@ struct tm_color_space_desc_t;
 struct tm_viewer_manager_o;
 struct tm_network_o;
 struct tm_render_pipeline_vt;
+struct tm_window_platform_data_o;
+struct tm_tab_create_context_t;
 
 typedef struct tm_application_o tm_application_o;
 
@@ -70,7 +71,7 @@ struct tm_application_api
     bool (*update_core)(const tm_application_o *app, bool include_skipped);
 
     // Signals the application to exit.
-    void (*exit)(tm_application_o *app);
+    void (*exit)(tm_application_o *app, bool force);
 
     // API-REVIEW: Questionable backwards dependencies
 
@@ -97,9 +98,18 @@ struct tm_application_api
     void (*color_space)(const struct tm_application_o *app, struct tm_color_space_desc_t *color_space, uint32_t *format);
 
     struct tm_network_o *(*network)(struct tm_application_o *app);
+
+    // If implemented this allows the application to create windows as child to externally created parent windows.
+    struct tm_window_o *(*create_child_window)(struct tm_application_o *app, struct tm_window_platform_data_o parent);
+
+    // Fills the [[tm_tab_create_context_t]] for this application.
+    // TODO (Frank): This seems a bit unsafe, we should add some validation that the right struct is passed.
+    void (*tab_create_context)(struct tm_application_o *app, struct tm_tab_create_context_t *context);
+
+    // Allows you to set a exit code.
+    void (*set_exit_code)(struct tm_application_o *app, int exit_code);
+    // Returns `EXIT_SUCCESS` unless a different value has been set via [[set_exit_code()]]
+    int (*exit_code)(struct tm_application_o *app);
 };
 
-#define tm_application_api_version TM_VERSION(1, 1, 0)
-
-
-#endif
+#define tm_application_api_version TM_VERSION(2, 0, 0)

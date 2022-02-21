@@ -1,5 +1,4 @@
-#ifndef FOUNDATION_THE_TRUTH
-#define FOUNDATION_THE_TRUTH
+#pragma once
 
 #include "api_types.h"
 
@@ -258,17 +257,17 @@ struct tm_set_t;
 // functionality. For example, you could add an interface for debug printing an object:
 //
 // ~~~c
-//  #define TM_TT_ASPECT__DEBUG_PRINT TM_STATIC_HASH("tm_debug_print_aspect_i", 0x39821c78639e0773ULL)
-//
 //  typedef struct tm_debug_print_aspect_i {
 //     void (*debug_print)(tm_the_truth_o *tt, uint64_t o);
 // } tm_debug_print_aspect_i;
+//
+// #define tm_debug_print_aspect_i_hash TM_STATIC_HASH("tm_debug_print_aspect_i", 0x39821c78639e0773ULL)
 // ~~~
 //
 // You could then use this code to debug print an object `o` with:
 //
 // ~~~c
-// tm_debug_print_aspect_i *dp = tm_the_truth_api->get_aspect(tt, tm_tt_type(o), TM_DEBUG_PRINT_ASPECT);
+// tm_debug_print_aspect_i *dp = tm_tt_get_aspect(tt, tm_tt_type(o), tm_debug_print_aspect_i);
 // if (dp)
 //     dp->debug_print(tt, o);
 // ~~~
@@ -330,7 +329,7 @@ typedef enum tm_the_truth_property_type {
 } tm_the_truth_property_type;
 
 // Specifies the "editor" that should be used for the property. (Note that
-// [[TM_TT_ASPECT__PROPERTIES]] can also be used as an alternative way of implementing a custom
+// [[tm_properties_aspect_i]] can also be used as an alternative way of implementing a custom
 // property editor.)
 enum tm_the_truth_editor {
     // The property should use the default editor for the type.
@@ -411,6 +410,10 @@ typedef struct tm_the_truth_property_definition_t
     //
     // This name is used both for serialization and for the UI of editing the property. When
     // displayed in the UI, the name will be automatically capitalized (e.g. "Cast Shadows").
+    //
+    // The name passed in the `.name` field is copied and retained by the Truth, so you can use
+    // a temporary string pointer for it. (Note that this is not true for the other strings in this
+    // struct, `.ui_name` and `.tooltip` must point to permanent memory.)
     //
     // The name shouldn't be longer than [[TM_THE_TRUTH_PROPERTY_NAME_LENGTH]] characters.
     const char *name;
@@ -1227,7 +1230,7 @@ struct tm_the_truth_api
     //
     // `original` should be the original object pointer obtained from [[try_write()]].
     //
-    // Returns *true* if the changes were successfully commited and *false* if someone else
+    // Returns *true* if the changes were successfully committed and *false* if someone else
     // committed the object before us. In this case, no changes are applied.
     //
     // You typically call [[try_write()]] and [[try_commit()]] in a loop where you retry the
@@ -1505,10 +1508,8 @@ struct tm_the_truth_api
     void (*serialize_changes)(tm_the_truth_o *tt, uint64_t begin, uint64_t end, char **carray,
         struct tm_allocator_i *a, const tm_tt_serialize_changes_options_t *opt);
 
-    // Deserializes a range of changes serialized by [[serialize_changes()]] and incorporates them
-    // into The Truth. The buffer pointer is advanced to point beyond the end of the serialized
-    // objects.
-    void (*deserialize_changes)(tm_the_truth_o *tt, const char **buffer,
+    // Deprecated. Use [[deserialize_changes()]] instead.
+    void (*deserialize_changes_deprecated)(tm_the_truth_o *tt, const char **buffer,
         const tm_tt_deserialize_changes_options_t *opt);
 
     // Creates a "patch" file that describes the changes that happened between object `to_o` in the
@@ -1750,16 +1751,72 @@ struct tm_the_truth_api
     // Gets the hash of a buffer.
     uint64_t (*get_buffer_hash)(const tm_the_truth_o *tt, const tm_the_truth_object_o *obj,
         uint32_t property);
+
+    // TODO(Leonardo): Added in 1.2.0. With 2.0.0, move this alongside "get_subobject_set_locally_removed".
+    // Returns an array with the members of the set that have been locally removed. I.e., members
+    // that exist in the prototype, but not in the local instance.
+    const tm_tt_id_t *(*get_reference_set_locally_removed)(const tm_the_truth_o *tt, const tm_the_truth_object_o *obj, uint32_t property, struct tm_temp_allocator_i *ta);
+
+    // Added in 1.3
+
+    // Returns the size of a buffer.
+    uint64_t (*get_buffer_size)(const tm_the_truth_o *tt, const tm_the_truth_object_o *obj,
+        uint32_t property);
+
+    // Added in 1.4
+
+    // Deserializes a range of changes serialized by [[serialize_changes()]] and incorporates them
+    // into The Truth. The buffer pointer is advanced to point beyond the end of the serialized
+    // objects.
+    //
+    // Returns true if the changes were successfully deserialized and false otherwise.
+    bool (*deserialize_changes)(tm_the_truth_o *tt, const char **buffer,
+        const tm_tt_deserialize_changes_options_t *opt);
 };
 
-#define tm_the_truth_api_version TM_VERSION(1, 1, 1)
+#define tm_the_truth_api_version TM_VERSION(1, 4, 0)
 
 // Convenience macro for quick reading of object data.
 #define tm_tt_read(tt, object) tm_the_truth_api->read(tt, object)
 
+// Convenience macro for checking if object is alive, to make us more prone to use alive checks
+// instead of comparing object.u64 != 0 (which is a bad test in case the objet is dead).
+#define tm_tt_alive(tt, object) tm_the_truth_api->is_alive(tt, object)
+
+// Type-safe implementation of [[get_aspect()]]. Retrieves an aspect of the specified type. Relies
+// on a `TYPE_hash` define to retrieve the hash of the aspect.
+//
+// !!! TODO: TODO
+//     Should we implement versioning for aspects?
+#define tm_tt_get_aspect(tt, object_type, TYPE) \
+    (TYPE *)tm_the_truth_api->get_aspect(tt, object_type, TYPE##_hash)
+
+// Type-safe implementation of [[set_aspect()]]. Sets an aspect of the specified type. Relies on a
+// `TYPE_hash` define to retrieve the hash of the aspect.
+#define tm_tt_set_aspect(tt, object_type, TYPE, ptr)                           \
+    do {                                                                       \
+        TYPE *typed_ptr = ptr;                                                 \
+        tm_the_truth_api->set_aspect(tt, object_type, TYPE##_hash, typed_ptr); \
+    } while (0)
+
+// Type-safe implementation of [[get_property_aspect()]]. Retrieves an aspect of the specified type. Relies
+// on a `TYPE_hash` define to retrieve the hash of the aspect.
+#define tm_tt_get_property_aspect(tt, object_type, property, TYPE) \
+    (TYPE *)tm_the_truth_api->get_property_aspect(tt, object_type, property, TYPE##_hash)
+
+// Type-safe implementation of [[set_property_aspect()]]. Sets an aspect of the specified type. Relies on a
+// `TYPE_hash` define to retrieve the hash of the aspect.
+#define tm_tt_set_property_aspect(tt, object_type, property, TYPE, ptr)                           \
+    do {                                                                                          \
+        TYPE *typed_ptr = ptr;                                                                    \
+        tm_the_truth_api->set_property_aspect(tt, object_type, property, TYPE##_hash, typed_ptr); \
+    } while (0)
+
+// Casts a [[tm_the_truth_o]] pointer to uint64_t. This macro is here just for documentation. We use
+// the TT pointer as owner of many tasks, so that we can fetch all tasks that have specific TT
+// as owner. Any task that reads or writes from TT should use this.
+#define tm_tt_task_owner(tt) ((uint64_t)(tt))
+
 #if defined(TM_LINKS_FOUNDATION)
 extern struct tm_the_truth_api *tm_the_truth_api;
-#endif
-
-
 #endif

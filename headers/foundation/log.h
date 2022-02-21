@@ -1,5 +1,4 @@
-#ifndef FOUNDATION_LOG
-#define FOUNDATION_LOG
+#pragma once
 
 #include "api_types.h"
 
@@ -51,7 +50,10 @@ enum tm_log_type {
 
     // Used for error messages. This should only be used for actual errors and it should be possible
     // for the user to fix the error and make the error message go away.
-    TM_LOG_TYPE_ERROR
+    TM_LOG_TYPE_ERROR,
+
+    // Used for extra logging while running in headless mode.
+    TM_LOG_TYPE_HEADLESS,
 };
 
 typedef struct tm_logger_o tm_logger_o;
@@ -97,9 +99,11 @@ struct tm_logger_api
 // [[TM_LOG_TYPE_INFO]] type.
 #define TM_LOG(format, ...) tm_logger_api->printf(TM_LOG_TYPE_INFO, "" format "", ##__VA_ARGS__)
 
+// Convenience macro for quick logging. Messages logged using this macro use the
+// [[TM_LOG_TYPE_HEADLESS]] type. They will not be logged unless [[TM_FEATURE_FLAG__HEADLESS_LOGGING]]
+// is true
+#define TM_LOG_HEADLESS(format, ...) tm_logger_api->printf(TM_LOG_TYPE_HEADLESS, "" format "", ##__VA_ARGS__)
+
 #if defined(TM_LINKS_FOUNDATION)
 extern struct tm_logger_api *tm_logger_api;
-#endif
-
-
 #endif

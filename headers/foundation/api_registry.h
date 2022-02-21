@@ -1,5 +1,4 @@
-#ifndef FOUNDATION_API_REGISTRY
-#define FOUNDATION_API_REGISTRY
+#pragma once
 
 #include "api_types.h"
 
@@ -92,7 +91,8 @@ struct tm_temp_allocator_i;
 // called with `load == true`. This will copy the new function pointers into the API table. Callers
 // using the API table obtained from [[tm_get_api()]] will automatically call the new functions.
 //
-// !!! TODO: TODO Add a note about hot reloading of interfaces.
+// !!! TODO: TODO
+//     Add a note about hot reloading of interfaces.
 //
 // ## Load order
 //
@@ -634,8 +634,5 @@ void tm_shutdown_global_api_registry(struct tm_allocator_i *a);
 // Convenience function to register all foundation APIs in the specified
 // registry.
 void tm_register_all_foundation_apis(struct tm_api_registry_api *pr);
-
-#endif
-
 
 #endif

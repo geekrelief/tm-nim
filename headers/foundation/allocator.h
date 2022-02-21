@@ -1,5 +1,4 @@
-#ifndef FOUNDATION_ALLOCATOR
-#define FOUNDATION_ALLOCATOR
+#pragma once
 
 #include "api_types.h"
 
@@ -58,7 +57,7 @@ typedef struct tm_allocator_i
 // Convenience macro for reallocating memory using [[tm_allocator_i]].
 #define tm_realloc(a, p, old_sz, new_sz) (a)->realloc(a, p, old_sz, new_sz, __FILE__, __LINE__)
 
-// Allocator statstics.
+// Allocator statistics.
 typedef struct tm_allocator_statistics_t
 {
     // Total number of allocations in the `system` allocator.
@@ -79,7 +78,7 @@ typedef struct tm_allocator_statistics_t
     // Bytes allocated in the `system` allocator since this counter was externally reset.
     TM_ATOMIC uint64_t system_churn_allocated_bytes;
 
-    // Virtual memory commited since this counter was externally reset.
+    // Virtual memory committed since this counter was externally reset.
     TM_ATOMIC uint64_t vm_churn_committed;
 } tm_allocator_statistics_t;
 
@@ -161,7 +160,4 @@ struct tm_allocator_api
 
 #if defined(TM_LINKS_FOUNDATION)
 extern struct tm_allocator_api *tm_allocator_api;
-#endif
-
-
 #endif

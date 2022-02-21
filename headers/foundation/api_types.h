@@ -1,5 +1,4 @@
-#ifndef FOUNDATION_API_TYPES
-#define FOUNDATION_API_TYPES
+#pragma once
 
 #include <stdarg.h>
 #include <stdbool.h>
@@ -83,7 +82,7 @@ typedef struct tm_str_t
 #define TM_STR(s) (TM_LITERAL(tm_str_t){ ("" s ""), (uint32_t)(sizeof("" s "") - 1), true })
 
 // Creates a [[tm_str_t]] from a start pointer `s` and end pointer `e`.
-#define tm_str_range(s, e) (TM_LITERAL(tm_str_t){ (s), (uint32_t)((e) - (s)), false })
+#define tm_str_range(s, e) (e > s ? TM_LITERAL(tm_str_t){ (s), (uint32_t)((e) - (s)), false } : TM_LITERAL(tm_str_t){ 0 })
 
 // Represents a time from the system clock.
 //
@@ -130,8 +129,6 @@ typedef struct tm_tt_type_t
     uint64_t u64;
 } tm_tt_type_t;
 
-#ifndef __ZIG__
-
 // ID representing an object in The Truth.
 typedef struct tm_tt_id_t
 {
@@ -158,21 +155,6 @@ static inline tm_tt_type_t tm_tt_type(tm_tt_id_t id)
     tm_tt_type_t res = { id.type };
     return res;
 }
-
-#else
-
-typedef struct tm_tt_id_t
-{
-    uint64_t u64;
-} tm_tt_id_t;
-
-static inline tm_tt_type_t tm_tt_type(tm_tt_id_t id)
-{
-    tm_tt_type_t res = { id.u64 & 0x3ff };
-    return res;
-}
-
-#endif
 
 // Type representing an undo scope in The Truth.
 typedef struct tm_tt_undo_scope_t
@@ -269,7 +251,9 @@ typedef struct tm_version_t
 #endif
 
 // String hashes
-//
+
+#if defined(_MSC_VER) && !defined(__clang__)
+
 // `#define TM_USE_STRHASH_TYPE` controls whether we should use a custom type [[tm_strhash_t]] for
 // string hashes, or if they should just be `uint64_t`. Currently, it is set to `0` when compiling
 // using MSVC and `1` otherwise.
@@ -282,11 +266,13 @@ typedef struct tm_version_t
 //
 // Hopefully, this will be fixed in a future Visual Studio release and we can transition fully to
 // the [[tm_strhash_t]] type.
-
-#if defined(_MSC_VER) && !defined(__clang__)
 #define TM_USE_STRHASH_TYPE 0
+
 #else
+
+// tm_docgen ignore
 #define TM_USE_STRHASH_TYPE 1
+
 #endif
 
 #if TM_USE_STRHASH_TYPE
@@ -321,7 +307,11 @@ typedef struct tm_strhash_t
 
 // tm_docgen ignore
 typedef uint64_t tm_strhash_t;
+
+// tm_docgen ignore
 #define TM_STRHASH(x) (x)
+
+// tm_docgen ignore
 #define TM_STRHASH_U64(x) (x)
 
 #endif
@@ -350,7 +340,10 @@ typedef uint64_t tm_strhash_t;
 // Macros
 
 #ifdef __cplusplus
+
+// tm_docgen ignore
 #define TM_LITERAL(T) T
+
 #else
 
 // Macro for creating a struct literal of type `T` that works both in C and C++. Use as:
@@ -374,16 +367,23 @@ typedef uint64_t tm_strhash_t;
 #define TM_DLL_EXPORT __declspec(dllexport)
 
 #else
+
+// tm_docgen ignore
 #define TM_DLL_EXPORT __attribute__((visibility("default")))
+
 #endif
 
+#if defined(TM_OS_MACOSX)
+#ifndef __restrict
+
+// tm_docgen ignore
+//
 // This is not ideal -- preferably we would want to use `restrict` rather than `__restrict` as our
 // `restrict` keyword, since that is what the C standard specifies. However, VS does not support
 // this, and if we try `#define restrict __restrict` we run into trouble, because some of the
 // windows headers actually use `restrict` already.
-#if defined(TM_OS_MACOSX)
-#ifndef __restrict
 #define __restrict restrict
+
 #endif
 #endif
 
@@ -393,8 +393,13 @@ typedef uint64_t tm_strhash_t;
 #define TM_ATOMIC
 
 #else
+
+// tm_docgen ignore
 #define TM_ATOMIC _Atomic
+
 #endif
+
+// tm_docgen off
 
 // Generate an error if this file was included in a C++ file, without wrapping the include in extern
 // "C". If you forget extern "C", the first declaration will get C++ linkage and you will then get a
@@ -403,6 +408,8 @@ typedef uint64_t tm_strhash_t;
 void use_extern_c_wrapper_to_include_the_machinery_headers_in_cpp_files(void);
 extern "C" void use_extern_c_wrapper_to_include_the_machinery_headers_in_cpp_files(void);
 #endif
+
+// tm_docgen on
 
 // Returns the `name` as a string.
 #define TM_STRINGIFY(name) #name
@@ -445,11 +452,6 @@ extern "C" void use_extern_c_wrapper_to_include_the_machinery_headers_in_cpp_fil
 
 #if defined(TM_OS_WINDOWS)
 
-#if defined(TCC)
-#define TM_DISABLE_PADDING_WARNINGS
-#define TM_RESTORE_PADDING_WARNINGS
-#else
-
 // Disable warnings about padding inserted into structs. Use this before including external headers
 // that do not explicitly declare padding. Restore the padding warning afterwards with
 // [[TM_RESTORE_PADDING_WARNINGS]].
@@ -460,22 +462,26 @@ extern "C" void use_extern_c_wrapper_to_include_the_machinery_headers_in_cpp_fil
 // Restore padding warnings disabled by [[TM_DISABLE_PADDING_WARNINGS]].
 #define TM_RESTORE_PADDING_WARNINGS \
     __pragma(warning(pop))
-#endif
+
 #elif defined(__clang__)
+// tm_docgen ignore
 #define TM_DISABLE_PADDING_WARNINGS  \
     _Pragma("clang diagnostic push") \
         _Pragma("clang diagnostic ignored \"-Wpadded\"")
+// tm_docgen ignore
 #define TM_RESTORE_PADDING_WARNINGS \
     _Pragma("clang diagnostic pop")
 #elif defined(__GNUC__) || defined(__GNUG__)
+// tm_docgen ignore
 #define TM_DISABLE_PADDING_WARNINGS \
     _Pragma("GCC diagnostic push")  \
         _Pragma("GCC diagnostic ignored \"-Wpadded\"")
+// tm_docgen ignore
 #define TM_RESTORE_PADDING_WARNINGS \
     _Pragma("GCC diagnostic pop")
 #endif
 
-#if !defined(__ZIG__) && !defined(__cplusplus)
+#if !defined(__cplusplus)
 
 // Used to implement "inheritance" -- inserting the members of one struct into another, with a
 // construct like:
@@ -496,13 +502,13 @@ extern "C" void use_extern_c_wrapper_to_include_the_machinery_headers_in_cpp_fil
 #define TM_INHERITS(TYPE) TYPE
 
 #else
+// tm_docgen ignore
 #define TM_INHERITS(TYPE) TYPE super
 #endif
 
 #if defined(TM_OS_MACOSX) && defined(TM_CPU_ARM)
+// tm_docgen ignore
 #define TM_PAGE_SIZE 16384
 #else
 #define TM_PAGE_SIZE 4096
-#endif
-
 #endif

@@ -1,5 +1,4 @@
-#ifndef FOUNDATION_MACROS
-#define FOUNDATION_MACROS
+#pragma once
 
 // Defines some commonly used macros.
 
@@ -38,7 +37,10 @@
 #define tm_or(a, b) ((a) ? (a) : (b))
 
 #else
+
+// tm_docgen ignore
 #define tm_or(a, b) ((a) ?: (b))
+
 #endif
 
 // Returns the minimum of `a` and `b`.
@@ -54,8 +56,8 @@
 // to be passed in any order at the price of more compare operations.
 #define tm_median(x, a, b) tm_clamp((x), tm_min((a), (b)), tm_max((a), (b)))
 
-// True if `b <= a <= c`.
-#define tm_is_between(a, b, c) ((a) >= (b) && (a) <= (c))
+// True if `lo <= x <= hi`.
+#define tm_is_between(x, lo, hi) ((x) >= (lo) && (x) <= (hi))
 
 // Used to mark `a` as an unused variable.
 #define tm_unused(a) (void)a
@@ -67,17 +69,12 @@
 #define tm_sizeof_member(structure, member) ((uint32_t)sizeof(((structure *)(1024))->member))
 
 #if defined(TM_OS_WINDOWS)
-#define TM_DIRSEP "\\"
-#else
-#define TM_DIRSEP "/"
-#endif
 
-#if defined(TM_OS_WINDOWS)
-#define TM_DLL_EXT "dll"
-#elif defined(TM_OS_MACOSX)
-#define TM_DLL_EXT "dylib"
-#elif defined(TM_OS_LINUX)
-#define TM_DLL_EXT "so"
-#endif
+#define TM_DIRSEP "\\"
+
+#else
+
+// tm_docgen ignore
+#define TM_DIRSEP "/"
 
 #endif

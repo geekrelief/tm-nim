@@ -1,5 +1,4 @@
-#ifndef FOUNDATION_PLUGIN_CALLBACKS
-#define FOUNDATION_PLUGIN_CALLBACKS
+#pragma once
 
 // Defines a callback API for the application to call into plugins.
 //
@@ -68,6 +67,3 @@ typedef struct tm_plugin_set_the_truth_i
 } tm_plugin_set_the_truth_i;
 
 #define tm_plugin_set_the_truth_i_version TM_VERSION(1, 0, 0)
-
-
-#endif

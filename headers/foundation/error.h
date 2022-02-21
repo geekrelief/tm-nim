@@ -1,5 +1,4 @@
-#ifndef FOUNDATION_ERROR
-#define FOUNDATION_ERROR
+#pragma once
 
 #include "api_types.h"
 
@@ -75,35 +74,53 @@ struct tm_error_api
     // Creates an error handler that stores all the encountered error messages in the `mem`
     // structure. In addition, it also passes along the errors to `mem->backing` (if non-zero).
     tm_error_i (*create_record_handler)(tm_error_record_t *mem);
+
+    // This can be used to enable to disable the stack strace print on logging a error.
+    void (*enable_print_stack_trace)(bool print);
 };
 
-#define tm_error_api_version TM_VERSION(1, 0, 0)
+#define tm_error_api_version TM_VERSION(1, 0, 1)
 
 #if defined(TM_LINKS_FOUNDATION)
 extern struct tm_error_api *tm_error_api;
 #endif
 
-// Macro that reports an error using [[tm_error_i->errorf()]]. Often called as `TM_ERROR(tm_error_api->def,
-// msg);`.
-#define TM_ERROR(ei, format, ...) \
+// Macro that reports an error using [[tm_error_i->errorf()]]. Uses the default error interface
+// [[tm_error_api->def]].
+#define TM_ERROR(format, ...) \
+    tm_error_api->def->errorf(tm_error_api->def->inst, __FILE__, __LINE__, "" format "", ##__VA_ARGS__)
+
+// As [[TM_ERROR()]] but lets you supply a custom implementation of [[tm_error_i]] in parameter `ei`.
+#define TM_ERROR_CUSTOM(ei, format, ...) \
     ei->errorf(ei->inst, __FILE__, __LINE__, "" format "", ##__VA_ARGS__)
 
-// Macro that asserts that the `test` condition is *true*.
+// Macro that asserts that the `test` condition is *true*. Uses the default error interface
+// [[tm_error_api->def]].
 //
-// If `test` evaluates to *false*, this function will call [[tm_error_i->errorf()]] with the `format, ...`
-// parameters.
+// If `test` evaluates to *false*, this function will call [[tm_error_i->errorf()]] with the
+// `format, ...` parameters.
 //
 // The macro returns the result of the `test`. You can use this to take an appropriate action to
 // proceed if the test fails, such as returning a default value, aborting the operation, etc.
-#define TM_ASSERT(test, ei, format, ...) \
+#define TM_ASSERT(test, format, ...) \
+    ((test) || (tm_error_api->def->errorf(tm_error_api->def->inst, __FILE__, __LINE__, "" format "", ##__VA_ARGS__), false))
+
+// As [[TM_ASSERT()]] but lets you supply a custom implementation of [[tm_error_i]] in parameter `ei`.
+#define TM_ASSERT_CUSTOM(test, ei, format, ...) \
     ((test) || (ei->errorf(ei->inst, __FILE__, __LINE__, "" format "", ##__VA_ARGS__), false))
 
 // As [[TM_ASSERT()]], but reports a fatal assert by calling [[errorf()]] and [[fatal()]]. You should use
 // this as a last resort in situations where there is no possible way for the application to
 // continue in case of a failure. Otherwise, prefer [[TM_ASSERT()]] and try to recover from the error
 // as best you can, we don't want to unnecessarily crash the user's application.
-#define TM_FATAL_ASSERT(test, ei) \
-    ((test) || (ei->errorf(ei->inst, __FILE__, __LINE__, "%s", #test), ei->fatal(ei->inst, __FILE__, __LINE__, "%s", #test), false))
+//
+// Uses default error interface [[tm_error_api->def]].
+#define TM_FATAL_ASSERT(test) \
+    ((test) || (tm_error_api->def->errorf(tm_error_api->def->inst, __FILE__, __LINE__, "%s", #test), tm_error_api->def->fatal(tm_error_api->def->inst, __FILE__, __LINE__, "%s", #test), false))
+
+// As [[TM_FATAL_ASSERT()]] but lets you supply a custom implementation of [[tm_error_i]] in parameter `ei`.
+#define TM_FATAL_ASSERT_CUSTOM(test, ei) \
+    ((test) || (ei->errorf(ei->inst, __FILE__, __LINE__, "%s", #test), tm_error_api->def->fatal(tm_error_api->def->inst, __FILE__, __LINE__, "%s", #test), false))
 
 // As [[TM_FATAL_ASSERT()]] but prints a formatted error message.
 //
@@ -113,7 +130,10 @@ extern struct tm_error_api *tm_error_api;
     ((test) || (ei->errorf(ei->inst, __FILE__, __LINE__, "" format "", ##__VA_ARGS__), ei->fatal(ei->inst, __FILE__, __LINE__, "" format "", ##__VA_ARGS__), false))
 
 #if defined(_MSC_VER) && !defined(__clang__)
+
+// tm_docgen ignore
 #define TM_STATIC_ASSERT(x) static_assert(x, #x)
+
 #else
 
 // A zero cost assert macro that is checked at compile time and produces a compile error if the
@@ -129,12 +149,10 @@ extern struct tm_error_api *tm_error_api;
 // void my_function(void)
 // {
 //     // TODO: Implement this.
-//     TM_NOT_YET_IMPLEMENTED(tm_error_api->def);
+//     TM_NOT_YET_IMPLEMENTED();
 // }
 // ~~~~
-#define TM_NOT_YET_IMPLEMENTED(ei) TM_ERROR(ei, "%s() not yet implemented", __func__)
+#define TM_NOT_YET_IMPLEMENTED() TM_ERROR("%s() not yet implemented", __func__)
 
 // Used to mark a function that has been deprecated and will be potentially deleted in a future release.
-#define TM_DEPRECATED(ei, message) TM_ERROR(ei, "function `%s` has been deprecated. %s", __func__, message)
-
-#endif
+#define TM_DEPRECATED(message) TM_ERROR("function `%s` has been deprecated. %s", __func__, message)
